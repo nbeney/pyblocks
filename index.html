@@ -3,78 +3,79 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Blocks to Python</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>PyBlocks - From Scratch to Python</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%231f2937' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z'/%3E%3Crect width='7' height='7' x='3' y='14' rx='1'/%3E%3Ccircle cx='17.5' cy='17.5' r='3.5'/%3E%3C/g%3E%3C/svg%3E">
 <style>
-:root{--bg:#f3f1fa;--panel:#fff;--bd:#d8d4ea;--tx:#25213a;--mut:#6d6888;--ws:#fbfaff;--fly:#ece9f7;--code:#fff;--gut:#f1eff9;--acc:#6c47ff;--ok:#1f9d57;--warn:#c77700;color-scheme:light;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17142a;--panel:#211d3b;--bd:#3a3562;--tx:#eceaff;--mut:#a29dc4;--ws:#1b1833;--fly:#2a2550;--code:#1b1833;--gut:#171430;--acc:#9a82ff;--ok:#4cd68a;--warn:#ffb340;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#17142a;--panel:#211d3b;--bd:#3a3562;--tx:#eceaff;--mut:#a29dc4;--ws:#1b1833;--fly:#2a2550;--code:#1b1833;--gut:#171430;--acc:#9a82ff;--ok:#4cd68a;--warn:#ffb340;color-scheme:dark}
+*{box-sizing:border-box}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-html,body{height:100%;margin:0}
-body{background:var(--bg);color:var(--tx);font:600 15px/1.4 Nunito,system-ui,sans-serif;display:grid;grid-template-rows:auto 1fr minmax(120px,26vh);gap:10px;padding:10px;box-sizing:border-box}
-header{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px}
-.mid{display:flex;align-items:center;justify-content:center;gap:14px}
-#run{justify-self:end}
-h1{font-size:20px;font-weight:800;margin:0 0 0 4px}
-button,select{font:inherit;border-radius:10px;border:2px solid var(--bd);background:var(--panel);color:var(--tx);padding:6px 12px;cursor:pointer}
-#run{background:var(--ok);border-color:var(--ok);color:#fff;font-weight:800;padding:7px 22px;font-size:16px}
-#run:disabled{opacity:.6;cursor:wait}
-#run:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
-#status{font-size:13px;color:var(--mut);display:flex;align-items:center;gap:6px;max-width:46ch}
-#dot{width:10px;height:10px;border-radius:50%;background:var(--ok);flex:none}
-#status.syncing #dot{background:var(--acc)}#status.warn #dot{background:var(--warn)}#status.warn{color:var(--warn)}
-main{display:grid;grid-template-columns:1fr 1fr;gap:10px;min-height:0}
-.pane{background:var(--panel);border:2px solid var(--bd);border-radius:14px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
-.pane>h2{margin:0;padding:7px 14px;font-size:14px;font-weight:800;color:var(--mut);border-bottom:2px solid var(--bd)}
+html,body{height:100%}
+body{margin:0;display:flex;flex-direction:column;font:14px system-ui,sans-serif;background:#f4f6fa;color:#222}
+#menubar{flex:none;height:48px;line-height:48px;padding:0 14px;background:#1f2937;color:#fff;font-weight:800;font-size:22px;letter-spacing:.08em;white-space:nowrap;overflow:hidden}
+#menubar span{color:#ff4d4d}
+#menubar small{margin-left:16px;font-size:14px;font-weight:400;letter-spacing:.02em;color:#aab2c0}
+#menubar iconify-icon{font-size:26px;vertical-align:-5px;margin-left:6px}
+header{display:flex;gap:10px;align-items:center;flex:none;height:48px;padding:0 12px;background:#fff;border-bottom:1px solid #d8dce5;overflow-x:auto}
+button{font:inherit;padding:6px 14px;border:0;border-radius:6px;cursor:pointer;background:#e3e7ef;color:#222}
+button:disabled{opacity:.4;cursor:default}
+button:focus-visible{outline:2px solid #2a6fdb;outline-offset:2px}
+iconify-icon{font-size:16px}
+#run,#exb{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px}
+#run{color:#fff;font-weight:700;min-width:110px;background:#1f9d4c}
+#status{margin-left:auto;display:flex;align-items:center;gap:6px;min-width:0;font-size:13px;color:#667}
+#stxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#status iconify-icon{flex:none;color:#1f9d4c;font-size:18px}
+#status.syncing iconify-icon{color:#2a6fdb;animation:spin 1s linear infinite}
+#status.warn,#status.warn iconify-icon{color:#c77700}
+@keyframes spin{to{transform:rotate(360deg)}}
+main{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 10px 0;min-height:0}
+.pan{background:#fff;border:1px solid #d8dce5;border-radius:8px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.pan>h3{margin:0;padding:5px 10px;min-height:30px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#667;border-bottom:1px solid #eceff4;display:flex;align-items:center;justify-content:space-between}
 .fill{position:relative;flex:1;min-height:0}
 #blockly{position:absolute;inset:0}
-.editor{display:flex;position:absolute;inset:0;background:var(--code)}
-#gut,#code{font:400 15px/1.6 "JetBrains Mono",ui-monospace,Menlo,monospace;padding:12px 0;margin:0;box-sizing:border-box}
-#gut{width:3.2em;text-align:right;padding-right:10px;background:var(--gut);color:var(--mut);overflow:hidden;white-space:pre;user-select:none}
-#code{flex:1;border:0;outline:0;resize:none;background:transparent;color:var(--tx);padding-left:12px;white-space:pre;overflow:auto;tab-size:4}
-#outwrap{background:#12101f;border:2px solid var(--bd);border-radius:14px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
-#outwrap h2{margin:0;padding:6px 14px;font-size:13px;color:#a29dc4;border-bottom:1px solid #332e55;display:flex;justify-content:space-between;align-items:center}
-#outwrap h2 button{padding:1px 10px;font-size:12px;background:transparent;color:#a29dc4;border-color:#332e55}
-#out{flex:1;margin:0;padding:10px 14px;overflow:auto;font:400 15px/1.5 "JetBrains Mono",ui-monospace,monospace;color:#d8f5e2;white-space:pre-wrap}
-#out .ask{font:inherit;color:#fff;background:#25213f;border:1px solid #9a82ff;border-radius:6px;padding:0 6px;outline:0;min-width:12ch}#out .err{color:#ff8f8f}#out .hint{color:#8c87ad}
-.blocklySvg{background:var(--ws)!important}
-.stale .blocklySvg{background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--warn) 16%,var(--ws)) 0 14px,color-mix(in srgb,var(--warn) 7%,var(--ws)) 14px 28px)!important}
-.pane.stale>h2::after{content:" \2014 out of date";color:var(--warn)}
-.blocklyToolboxDiv{background:var(--fly)!important}
-.blocklyToolboxCategoryLabel{color:var(--tx)!important;font-family:Nunito,sans-serif;font-weight:800}
-.blocklyFlyoutBackground{fill:var(--fly)!important;fill-opacity:.97!important}
-.modal{position:fixed;inset:0;background:#0008;display:grid;place-items:center;z-index:100}.modal form{background:var(--panel);border:2px solid var(--bd);border-radius:14px;padding:18px;display:grid;gap:14px;min-width:min(320px,88vw)}.modal input{display:block;width:100%;box-sizing:border-box;margin-top:6px;font:inherit;padding:6px 10px;border-radius:8px;border:2px solid var(--bd);background:var(--ws);color:var(--tx)}.modal div{display:flex;gap:8px;justify-content:flex-end}.modal .go{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:800}
-@media (max-width:760px){header{grid-template-columns:1fr auto}.mid{grid-column:1/-1;grid-row:2;flex-wrap:wrap}main{grid-template-columns:1fr;grid-template-rows:1fr 1fr}body{grid-template-rows:auto 1fr minmax(110px,24vh)}}
+#ed{flex:1;min-height:0}.CodeMirror{height:100%;font:14px/1.45 ui-monospace,Consolas,monospace}
+#bottom{flex:none;height:26vh;min-height:120px;padding:10px;display:flex}#bottom .pan{flex:1}
+#out{flex:1;margin:0;padding:8px;overflow:auto;background:#1b1e27;color:#e6e6e6;font:13px ui-monospace,Consolas,monospace;white-space:pre-wrap}
+#out .err{color:#ff7b72}#out .hint{color:#8b93a7}
+#out .ask{font:inherit;color:#7ee787;background:#262a36;border:1px solid #5b6478;border-radius:4px;padding:0 6px;outline:0;min-width:12ch}
+.mini{padding:2px 8px;background:transparent;color:#667}.mini:hover{background:#e3e7ef}
+#exm{display:none;position:fixed;z-index:30;background:#fff;border:1px solid #ccd;border-radius:8px;box-shadow:0 4px 14px #0003;min-width:190px;padding:4px;font-size:13px}#ex.open #exm{display:block}
+.mi{padding:6px 10px;border-radius:5px;cursor:pointer;white-space:nowrap}.mi:hover{background:#e8f0fe}
+.blocklySvg{background:#fff!important}
+.blocklyToolboxDiv{background:#eef1f7!important}
+.blocklyToolboxCategoryLabel{color:#222!important;font-family:system-ui,sans-serif;font-weight:700}
+.blocklyFlyoutBackground{fill:#eef1f7!important;fill-opacity:.97!important}
+.stale .blocklySvg{background:repeating-linear-gradient(45deg,#ffefcc 0 14px,#fff8e8 14px 28px)!important}
+.pan.stale>h3::after{content:"\2014 out of date";color:#c77700;text-transform:none;letter-spacing:0}
+.modal{position:fixed;inset:0;background:#0006;display:grid;place-items:center;z-index:100}.modal form{background:#fff;border:1px solid #ccd;border-radius:10px;padding:16px;display:grid;gap:12px;min-width:min(320px,88vw)}.modal input{display:block;width:100%;margin-top:6px;font:inherit;padding:6px 10px;border-radius:6px;border:1px solid #b9c0d0}.modal div{display:flex;gap:8px;justify-content:flex-end}.modal .go{background:#2a6fdb;color:#fff;font-weight:700}
+footer{flex:none;background:#fff;color:#667;border-top:1px solid #d8dce5;font-size:12px;padding:7px 14px;text-align:center}footer a{color:#2a6fdb;text-decoration:none}footer a:hover{text-decoration:underline}
+@media (max-width:760px){main{grid-template-columns:1fr;grid-template-rows:1fr 1fr}#menubar small{display:none}}
+.CodeMirror{font-family:monospace;height:300px;color:black;direction:ltr;}.CodeMirror-lines{padding:4px 0;}.CodeMirror pre.CodeMirror-line,.CodeMirror pre.CodeMirror-line-like{padding:0 4px;}.CodeMirror-scrollbar-filler,.CodeMirror-gutter-filler{background-color:white;}.CodeMirror-gutters{border-right:1px solid #ddd;background-color:#f7f7f7;white-space:nowrap;}.CodeMirror-linenumbers{}.CodeMirror-linenumber{padding:0 3px 0 5px;min-width:20px;text-align:right;color:#999;white-space:nowrap;}.CodeMirror-guttermarker{color:black;}.CodeMirror-guttermarker-subtle{color:#999;}.CodeMirror-cursor{border-left:1px solid black;border-right:none;width:0;}.CodeMirror div.CodeMirror-secondarycursor{border-left:1px solid silver;}.cm-fat-cursor .CodeMirror-cursor{width:auto;border:0 !important;background:#7e7;}.cm-fat-cursor div.CodeMirror-cursors{z-index:1;}.cm-fat-cursor .CodeMirror-line::selection,.cm-fat-cursor .CodeMirror-line>span::selection,.cm-fat-cursor .CodeMirror-line>span>span::selection{background:transparent;}.cm-fat-cursor .CodeMirror-line::-moz-selection,.cm-fat-cursor .CodeMirror-line>span::-moz-selection,.cm-fat-cursor .CodeMirror-line>span>span::-moz-selection{background:transparent;}.cm-fat-cursor{caret-color:transparent;}@-moz-keyframes blink{0%{}50%{background-color:transparent;}100%{}}@-webkit-keyframes blink{0%{}50%{background-color:transparent;}100%{}}@keyframes blink{0%{}50%{background-color:transparent;}100%{}}.CodeMirror-overwrite .CodeMirror-cursor{}.cm-tab{display:inline-block;text-decoration:inherit;}.CodeMirror-rulers{position:absolute;left:0;right:0;top:-50px;bottom:0;overflow:hidden;}.CodeMirror-ruler{border-left:1px solid #ccc;top:0;bottom:0;position:absolute;}.cm-s-default .cm-header{color:blue;}.cm-s-default .cm-quote{color:#090;}.cm-negative{color:#d44;}.cm-positive{color:#292;}.cm-header,.cm-strong{font-weight:bold;}.cm-em{font-style:italic;}.cm-link{text-decoration:underline;}.cm-strikethrough{text-decoration:line-through;}.cm-s-default .cm-keyword{color:#708;}.cm-s-default .cm-atom{color:#219;}.cm-s-default .cm-number{color:#164;}.cm-s-default .cm-def{color:#00f;}.cm-s-default .cm-variable,.cm-s-default .cm-punctuation,.cm-s-default .cm-property,.cm-s-default .cm-operator{}.cm-s-default .cm-variable-2{color:#05a;}.cm-s-default .cm-variable-3,.cm-s-default .cm-type{color:#085;}.cm-s-default .cm-comment{color:#a50;}.cm-s-default .cm-string{color:#a11;}.cm-s-default .cm-string-2{color:#f50;}.cm-s-default .cm-meta{color:#555;}.cm-s-default .cm-qualifier{color:#555;}.cm-s-default .cm-builtin{color:#30a;}.cm-s-default .cm-bracket{color:#997;}.cm-s-default .cm-tag{color:#170;}.cm-s-default .cm-attribute{color:#00c;}.cm-s-default .cm-hr{color:#999;}.cm-s-default .cm-link{color:#00c;}.cm-s-default .cm-error{color:#f00;}.cm-invalidchar{color:#f00;}.CodeMirror-composing{border-bottom:2px solid;}div.CodeMirror span.CodeMirror-matchingbracket{color:#0b0;}div.CodeMirror span.CodeMirror-nonmatchingbracket{color:#a22;}.CodeMirror-matchingtag{background:rgba(255,150,0,.3);}.CodeMirror-activeline-background{background:#e8f2ff;}.CodeMirror{position:relative;overflow:hidden;background:white;}.CodeMirror-scroll{overflow:scroll !important;margin-bottom:-50px;margin-right:-50px;padding-bottom:50px;height:100%;outline:none;position:relative;z-index:0;}.CodeMirror-sizer{position:relative;border-right:50px solid transparent;}.CodeMirror-vscrollbar,.CodeMirror-hscrollbar,.CodeMirror-scrollbar-filler,.CodeMirror-gutter-filler{position:absolute;z-index:6;display:none;outline:none;}.CodeMirror-vscrollbar{right:0;top:0;overflow-x:hidden;overflow-y:scroll;}.CodeMirror-hscrollbar{bottom:0;left:0;overflow-y:hidden;overflow-x:scroll;}.CodeMirror-scrollbar-filler{right:0;bottom:0;}.CodeMirror-gutter-filler{left:0;bottom:0;}.CodeMirror-gutters{position:absolute;left:0;top:0;min-height:100%;z-index:3;}.CodeMirror-gutter{white-space:normal;height:100%;display:inline-block;vertical-align:top;margin-bottom:-50px;}.CodeMirror-gutter-wrapper{position:absolute;z-index:4;background:none !important;border:none !important;}.CodeMirror-gutter-background{position:absolute;top:0;bottom:0;z-index:4;}.CodeMirror-gutter-elt{position:absolute;cursor:default;z-index:4;}.CodeMirror-gutter-wrapper::selection{background-color:transparent}.CodeMirror-gutter-wrapper::-moz-selection{background-color:transparent}.CodeMirror-lines{cursor:text;min-height:1px;}.CodeMirror pre.CodeMirror-line,.CodeMirror pre.CodeMirror-line-like{-moz-border-radius:0;-webkit-border-radius:0;border-radius:0;border-width:0;background:transparent;font-family:inherit;font-size:inherit;margin:0;white-space:pre;word-wrap:normal;line-height:inherit;color:inherit;z-index:2;position:relative;overflow:visible;-webkit-tap-highlight-color:transparent;-webkit-font-variant-ligatures:contextual;font-variant-ligatures:contextual;}.CodeMirror-wrap pre.CodeMirror-line,.CodeMirror-wrap pre.CodeMirror-line-like{word-wrap:break-word;white-space:pre-wrap;word-break:normal;}.CodeMirror-linebackground{position:absolute;left:0;right:0;top:0;bottom:0;z-index:0;}.CodeMirror-linewidget{position:relative;z-index:2;padding:0.1px;}.CodeMirror-widget{}.CodeMirror-rtl pre{direction:rtl;}.CodeMirror-code{outline:none;}.CodeMirror-scroll,.CodeMirror-sizer,.CodeMirror-gutter,.CodeMirror-gutters,.CodeMirror-linenumber{-moz-box-sizing:content-box;box-sizing:content-box;}.CodeMirror-measure{position:absolute;width:100%;height:0;overflow:hidden;visibility:hidden;}.CodeMirror-cursor{position:absolute;pointer-events:none;}.CodeMirror-measure pre{position:static;}div.CodeMirror-cursors{visibility:hidden;position:relative;z-index:3;}div.CodeMirror-dragcursors{visibility:visible;}.CodeMirror-focused div.CodeMirror-cursors{visibility:visible;}.CodeMirror-selected{background:#d9d9d9;}.CodeMirror-focused .CodeMirror-selected{background:#d7d4f0;}.CodeMirror-crosshair{cursor:crosshair;}.CodeMirror-line::selection,.CodeMirror-line>span::selection,.CodeMirror-line>span>span::selection{background:#d7d4f0;}.CodeMirror-line::-moz-selection,.CodeMirror-line>span::-moz-selection,.CodeMirror-line>span>span::-moz-selection{background:#d7d4f0;}.cm-searching{background-color:#ffa;background-color:rgba(255,255,0,.4);}.cm-force-border{padding-right:.1px;}@media print{.CodeMirror div.CodeMirror-cursors{visibility:hidden;}}.cm-tab-wrap-hack:after{content:'';}span.CodeMirror-selectedtext{background:none;}
 </style>
 </head>
 <body>
+<div id="menubar"><span>PY</span>BLOCKS <iconify-icon icon="lucide:shapes"></iconify-icon><small>From blocks to text</small></div>
 <header>
-  <h1>Blocks to Python</h1>
-  <div class="mid">
-  <select id="examples" aria-label="Load an example">
-    <option value="">Try an example…</option>
-    <option value="hello">Say hello</option>
-    <option value="ask">Ask a question</option>
-    <option value="func">Make a function</option>
-    <option value="loop">Count with a loop</option>
-    <option value="decide">Make a decision</option>
-  </select>
-  <div id="status"><span id="dot"></span><span id="stxt">In sync</span></div>
-  </div>
-  <button id="run" title="Run (Ctrl+Enter)">▶ Run</button>
+  <button id="run" title="Run the program (Ctrl+Enter)"><iconify-icon icon="lucide:play"></iconify-icon> Run</button>
+  <div id="ex"><button id="exb" title="Load an example">Examples <iconify-icon icon="lucide:chevron-down"></iconify-icon></button><div id="exm"></div></div>
+  <div id="status" class="ok"><iconify-icon id="sicon" icon="lucide:circle-check"></iconify-icon><span id="stxt">Blocks and code are in sync</span></div>
 </header>
 <main>
-  <section class="pane" id="bpane"><h2>Blocks</h2><div class="fill"><div id="blockly"></div></div></section>
-  <section class="pane"><h2>Python</h2><div class="fill"><div class="editor"><pre id="gut">1</pre><textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" aria-label="Python code"></textarea></div></div></section>
+  <section class="pan" id="bpane"><h3>Blocks</h3><div class="fill"><div id="blockly"></div></div></section>
+  <section class="pan"><h3>Python code (Ctrl-Enter)</h3><div id="ed"></div></section>
 </main>
-<section id="outwrap"><h2>Output <button id="clear">Clear</button></h2><pre id="out"><span class="hint">Press Run to see what your program prints.</span></pre></section>
+<div id="bottom"><section class="pan"><h3>Output <button id="clear" class="mini" title="Clear output"><iconify-icon icon="lucide:eraser"></iconify-icon></button></h3><pre id="out"><span class="hint">Press Run to see what your program prints.</span></pre></section></div>
+<footer>© Nicolas Beney. Licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0 ↗</a></footer>
 
 <script src="https://cdn.jsdelivr.net/npm/blockly@10.4.3/blockly_compressed.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/blockly@10.4.3/msg/en.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js"></script>
+<script>customElements.get('iconify-icon').addCollection({"prefix":"lucide","width":24,"height":24,"icons":{"shapes":{"body":"<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z\"/><rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\"/><circle cx=\"17.5\" cy=\"17.5\" r=\"3.5\"/></g>"},"play":{"body":"<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z\"/>"},"chevron-down":{"body":"<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m6 9l6 6l6-6\"/>"},"eraser":{"body":"<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21m-7.752-9.91l8.828 8.828\"/>"},"circle-check":{"body":"<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16 9l-5.5 5.5L8 12\"/></g>"},"refresh-cw":{"body":"<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M3 12a9 9 0 0 1 9-9a9.75 9.75 0 0 1 6.74 2.74L21 8\"/><path d=\"M21 3v5h-5m5 4a9 9 0 0 1-9 9a9.75 9.75 0 0 1-6.74-2.74L3 16\"/><path d=\"M8 16H3v5\"/></g>"},"triangle-alert":{"body":"<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01\"/>"}}})</script>
 <script>
 /* ---------- Block definitions ---------- */
 const iv=n=>({type:'input_value',name:n}), st=n=>({type:'input_statement',name:n});
@@ -101,7 +102,8 @@ Blockly.defineBlocksWithJsonArray([
  {type:'py_fn',message0:'%1 ( %2 )',args0:[dd('F',FN),iv('A')],inputsInline:true,output:null,colour:20},
  {type:'py_input',message0:'input( %1 )',args0:[iv('A')],inputsInline:true,output:null,colour:20},
  {type:'py_def',message0:'def %1 ( %2 ):',args0:[fi('NAME','say_hello'),fi('P','')],message1:'%1',args1:[st('DO')],colour:290,...SB},
- {type:'py_return',message0:'return %1',args0:[iv('V')],colour:290,...SB}
+ {type:'py_return',message0:'return %1',args0:[iv('V')],colour:290,...SB},
+ {type:'py_comment',message0:'# %1',args0:[fi('T','my comment')],colour:'#8a94a6',...SB}
 ]);
 /* ---------- Variables: pick from a list, or make a new one ---------- */
 let ws;
@@ -151,7 +153,7 @@ const sh=(type,f)=>({shadow:{type,fields:f}});
 const T=t=>sh('py_text',{T:t}), N=n=>sh('py_num',{N:n});
 const B=(type,inputs)=>({kind:'block',type,inputs});
 const toolbox={kind:'categoryToolbox',contents:[
- {kind:'category',name:'Output',colour:'160',contents:[B('py_print',{V:T('Hello!')})]},
+ {kind:'category',name:'Output',colour:'160',contents:[B('py_print',{V:T('Hello!')}),B('py_comment')]},
  {kind:'category',name:'Variables',colour:'330',custom:'PYVARS'},
  {kind:'category',name:'Logic',colour:'210',contents:[B('py_if'),B('py_ifelse'),B('py_cmp',{A:N(0),B:N(0)}),B('py_logic'),B('py_not'),B('py_bool')]},
  {kind:'category',name:'Loops',colour:'120',contents:[B('py_for',{N:N(10)}),B('py_while')]},
@@ -178,7 +180,7 @@ function expr(b){const op=b.getFieldValue('OP');
   case 'py_input':return[`input(${b.getInputTargetBlock('A')?val(b,'A')[0]:''})`,10];
   case 'py_fn':return[`${b.getFieldValue('F')}(${val(b,'A')[0]})`,10];
  }return['None',10]}
-const body=(b,n,ind)=>{const c=b.getInputTargetBlock(n);return (c&&stmts(c,ind+1))||'    '.repeat(ind+1)+'pass\n'};
+const body=(b,n,ind)=>{const c=b.getInputTargetBlock(n);const s=c?stmts(c,ind+1):'';return /^\s*[^#\s]/m.test(s)?s:s+'    '.repeat(ind+1)+'pass\n'};
 function stmts(b,ind){let o='';for(;b;b=b.getNextBlock())o+=stmt(b,ind);return o}
 function ifGen(b,ind,kw){const pad='    '.repeat(ind);let s=`${pad}${kw} ${val(b,'C')[0]}:\n`+body(b,'DO',ind);
  if(b.type==='py_ifelse'){const e=b.getInputTargetBlock('EL');
@@ -190,6 +192,7 @@ function stmt(b,ind){const pad='    '.repeat(ind);
   case 'py_set':return pad+`${nm(b)} = ${val(b,'V')[0]}\n`;
   case 'py_change':return pad+`${nm(b)} += ${val(b,'V')[0]}\n`;
   case 'py_if':case 'py_ifelse':return ifGen(b,ind,'if');
+  case 'py_comment':return pad+'# '+String(b.getFieldValue('T')).replace(/\n/g,' ')+'\n';
   case 'py_callstmt':return pad+callCode(b)+'\n';
   case 'py_return':return pad+'return'+(b.getInputTargetBlock('V')?' '+val(b,'V')[0]:'')+'\n';
   case 'py_def':return pad+`def ${cleanId(b.getFieldValue('NAME'))||'my_function'}(${params(b)}):\n`+body(b,'DO',ind)+(ind?'':'\n');
@@ -203,7 +206,7 @@ const unesc=s=>s.replace(/\\(.)/g,(a,c)=>c==='n'?'\n':c==='t'?'\t':c);
 let hasComment=false;
 function tokenize(src){const lines=[];hasComment=false;
  src.replace(/\r/g,'').split('\n').forEach((ln,i)=>{
-  const t=ln.replace(/\t/g,'    ');if(!t.trim())return;if(t.trim()[0]==='#'){hasComment=true;return}
+  const t=ln.replace(/\t/g,'    ');if(!t.trim())return;if(t.trim()[0]==='#'){lines.push({n:i+1,indent:-1,cm:t.trim().replace(/^#\s?/,'')});return}
   const indent=t.match(/^ */)[0].length,toks=[];let s=t.trim(),m;
   while(s.length){
    if(s[0]===' '){s=s.slice(1);continue}
@@ -215,7 +218,9 @@ function tokenize(src){const lines=[];hasComment=false;
    else throw{line:i+1,msg:`blocks don’t know the character “${s[0]}”`};
    s=s.slice(m[0].length)}
   lines.push({n:i+1,indent,toks})});
- return lines}
+ let nx=null;for(let k=lines.length-1;k>=0;k--){const L=lines[k];if(L.cm===undefined){nx=L;continue}
+  if(nx&&(nx.toks[0].v==='else'||nx.toks[0].v==='elif')){hasComment=true;L.drop=true}else L.indent=nx?nx.indent:0}
+ return lines.filter(L=>!L.drop)}
 class P{
  constructor(t,n){this.t=t;this.i=0;this.n=n}
  peek(){return this.t[this.i]}
@@ -255,12 +260,13 @@ function sub(lines,i,indent,n){
 function ifS(lines,i,indent,p,n){
  const c=p.or();p.need(':');p.end();
  let [th,j]=sub(lines,i,indent,n),el=null;const L=lines[j];
- if(L&&L.indent===indent&&L.toks[0].k==='id'){const kw=L.toks[0].v,q=new P(L.toks,L.n);q.i=1;
+ if(L&&L.toks&&L.indent===indent&&L.toks[0].k==='id'){const kw=L.toks[0].v,q=new P(L.toks,L.n);q.i=1;
   if(kw==='elif'){const [nd,k]=ifS(lines,j+1,indent,q,L.n);el=[nd];j=k}
   else if(kw==='else'){q.need(':');q.end();[el,j]=sub(lines,j+1,indent,L.n)}}
  return[{t:'if',c,th,el},j]}
 function parseBlock(lines,i,indent){const out=[];
  while(i<lines.length&&lines[i].indent===indent){
+  if(lines[i].cm!==undefined){out.push({t:'comment',text:lines[i++].cm});continue}
   const L=lines[i++],p=new P(L.toks,L.n),f=p.peek();let kw=f.k==='id'?f.v:'';
   if(kw==='print'&&L.toks[1]&&L.toks[1].v==='('){p.i=2;let e={t:'none'};
    if(!p.is(')')){e=p.or();if(p.is(','))p.fail('a print block shows one thing — join pieces with + and str()')}
@@ -283,7 +289,7 @@ function parseBlock(lines,i,indent){const out=[];
  return[out,i]}
 const DEFS=new Set();
 function parse(src){const lines=tokenize(src);if(!lines.length)return[];
- DEFS.clear();lines.forEach(l=>{if(l.toks[0].v==='def'&&l.toks[1])DEFS.add(l.toks[1].v)});
+ DEFS.clear();lines.forEach(l=>{if(l.toks&&l.toks[0].v==='def'&&l.toks[1])DEFS.add(l.toks[1].v)});
  if(lines[0].indent)throw{line:lines[0].n,msg:'unexpected indent'};
  const[out,i]=parseBlock(lines,0,0);
  if(i<lines.length)throw{line:lines[i].n,msg:'unexpected indent'};return out}
@@ -309,6 +315,7 @@ function stmt2(s){let b;switch(s.t){
  case 'print':b=mk('py_print');put(b,'V',s.e);break;
  case 'set':case 'change':b=mk(s.t==='set'?'py_set':'py_change');b.setFieldValue(s.n,'N');put(b,'V',s.e);break;
  case 'if':b=mk(s.el?'py_ifelse':'py_if');put(b,'C',s.c);putS(b,'DO',s.th);if(s.el)putS(b,'EL',s.el);break;
+ case 'comment':b=mk('py_comment');b.setFieldValue(s.text,'T');break;
  case 'def':b=mk('py_def');b.setFieldValue(s.name,'NAME');b.setFieldValue(s.params.join(', '),'P');putS(b,'DO',s.body);break;
  case 'return':b=mk('py_return');put(b,'V',s.e);break;
  case 'callstmt':b=mk('py_callstmt');b.setFieldValue(s.f,'F');b.setN(s.args.length);s.args.forEach((a,i)=>put(b,'A'+i,a));break;
@@ -324,7 +331,7 @@ function rebuild(ast){Blockly.Events.disable();
 
 /* ---------- Workspace + two-way sync ---------- */
 const $=id=>document.getElementById(id);
-const ta=$('code'),gut=$('gut'),out=$('out');
+const out=$('out');
 ws=Blockly.inject('blockly',{toolbox,renderer:'zelos',trashcan:true,
  zoom:{controls:true,wheel:false,startScale:.95},grid:{spacing:24,length:3,colour:'#8884',snap:true},move:{scrollbars:true,drag:true,wheel:true}});
 ws.registerToolboxCategoryCallback('PYFUNCS',()=>{
@@ -341,41 +348,21 @@ ws.registerToolboxCategoryCallback('PYVARS',()=>{const v=allVars();
  return L});
 new ResizeObserver(()=>Blockly.svgResize(ws)).observe($('blockly'));
 
+const SI={ok:'lucide:circle-check',syncing:'lucide:refresh-cw',warn:'lucide:triangle-alert'};
 function setStatus(kind,msg){const s=$('status');s.className=kind;if(kind==='warn')$('bpane').classList.add('stale');else if(kind==='ok')$('bpane').classList.remove('stale');
- $('stxt').textContent=msg||(kind==='syncing'?'Syncing…':'Blocks and code are in sync')}
-function gutter(){gut.textContent=Array.from({length:ta.value.split('\n').length},(_,i)=>i+1).join('\n');gut.scrollTop=ta.scrollTop}
+ const t=msg||(kind==='syncing'?'Syncing…':'Blocks and code are in sync');$('stxt').textContent=t;s.title=t;$('sicon').setAttribute('icon',SI[kind])}
+const cm=CodeMirror($('ed'),{value:'',mode:'python',lineNumbers:true,indentUnit:4,
+ extraKeys:{Tab:'indentMore','Shift-Tab':'indentLess','Ctrl-/':'toggleComment','Cmd-/':'toggleComment'}});
+new ResizeObserver(()=>cm.refresh()).observe($('ed'));
+function setCode(t){if(cm.getValue()===t)return;const c=cm.getCursor(),si=cm.getScrollInfo();cm.setValue(t);cm.setCursor(c);cm.scrollTo(si.left,si.top)}
 let tB=0,tC=0,pB=false,pC=false;
-
-function blocksToCode(){pB=false;ta.value=generate();gutter();setStatus('ok')}
+function blocksToCode(){pB=false;setCode(generate());setStatus('ok')}
 function codeToBlocks(){pC=false;
- try{rebuild(parse(ta.value));if(hasComment)setStatus('warn','Your code has comments. Blocks can’t show them — editing the blocks will remove them.');else setStatus('ok')}
+ try{rebuild(parse(cm.getValue()));if(hasComment)setStatus('warn','Your code has comments. Blocks can’t show them — editing the blocks will remove them.');else setStatus('ok')}
  catch(e){if(!e||!e.line)throw e;
   setStatus('warn',`Line ${e.line}: ${e.msg}. Blocks show your last working version — editing them will replace your code.`)}}
-
 ws.addChangeListener(e=>{if(e.isUiEvent)return;pB=true;setStatus('syncing');clearTimeout(tB);tB=setTimeout(blocksToCode,350)});
-ta.addEventListener('input',()=>{pC=true;gutter();setStatus('syncing');clearTimeout(tC);tC=setTimeout(codeToBlocks,700)});
-ta.addEventListener('scroll',()=>gut.scrollTop=ta.scrollTop);
-function toggleComment(){const v=ta.value,s=ta.selectionStart,e=ta.selectionEnd;
- const a=s?v.lastIndexOf('\n',s-1)+1:0;let b=v.indexOf('\n',e>s&&v[e-1]==='\n'?e-1:e);if(b<0)b=v.length;
- const lines=v.slice(a,b).split('\n'),ne=lines.filter(l=>l.trim());
- const un=ne.length>0&&ne.every(l=>l.trim()[0]==='#'),ind=Math.min(...ne.map(l=>l.match(/^ */)[0].length));
- const out=lines.map(l=>!l.trim()?l:un?l.replace(/^(\s*)# ?/,'$1'):l.slice(0,ind)+'# '+l.slice(ind)).join('\n');
- ta.setRangeText(out,a,b,'end');
- if(s===e){const p=Math.max(a,s+out.length-(b-a));ta.setSelectionRange(p,p)}else ta.setSelectionRange(a,a+out.length);
- ta.dispatchEvent(new Event('input'))}
-function indentLines(dir){const v=ta.value,s=ta.selectionStart,e=ta.selectionEnd;
- const a=s?v.lastIndexOf('\n',s-1)+1:0;let b=v.indexOf('\n',e>s&&v[e-1]==='\n'?e-1:e);if(b<0)b=v.length;
- const lines=v.slice(a,b).split('\n'),cut=lines.map(l=>Math.min(4,l.match(/^ */)[0].length));
- const out=lines.map((l,i)=>dir>0?(l.trim()?'    '+l:l):l.slice(cut[i])).join('\n'),total=out.length-(b-a);
- ta.setRangeText(out,a,b,'end');
- const ns=Math.max(a,s+(dir>0?(lines[0].trim()?4:0):-cut[0]));ta.setSelectionRange(ns,Math.max(ns,e+total));
- ta.dispatchEvent(new Event('input'))}
-function ins(t){ta.setRangeText(t,ta.selectionStart,ta.selectionEnd,'end');ta.dispatchEvent(new Event('input'))}
-ta.addEventListener('keydown',e=>{
- if((e.ctrlKey||e.metaKey)&&e.key==='/'){e.preventDefault();toggleComment()}
- else if(e.key==='Tab'){e.preventDefault();indentLines(e.shiftKey?-1:1)}
- else if(e.key==='Enter'){e.preventDefault();const v=ta.value,s=ta.selectionStart,ls=s?v.lastIndexOf('\n',s-1)+1:0,line=v.slice(ls,s);
-  ins('\n'+line.match(/^ */)[0]+(line.trim().endsWith(':')?'    ':''))}});
+cm.on('change',(_,c)=>{if(c.origin==='setValue')return;pC=true;setStatus('syncing');clearTimeout(tC);tC=setTimeout(codeToBlocks,700)});
 
 const EX={
  func:'def greet(name):\n    print("Hello, " + name + "!")\n\ndef double(n):\n    return n * 2\n\ngreet("Sam")\nprint(double(21))\n',
@@ -383,8 +370,12 @@ const EX={
  hello:'name = "Sam"\nprint("Hello, " + name + "!")\n',
  loop:'total = 0\nfor i in range(5):\n    total += i\n    print(i)\nprint("Total: " + str(total))\n',
  decide:'score = 0\nfor i in range(3):\n    score += 10\nname = "Sam"\nif score > 20:\n    print(name + " did great!")\nelif score > 10:\n    print("Nice try")\nelse:\n    print("Keep practising")\n'};
-function load(code){clearTimeout(tB);clearTimeout(tC);ta.value=code;gutter();codeToBlocks()}
-$('examples').addEventListener('change',e=>{if(e.target.value)load(EX[e.target.value]);e.target.value=''});
+function load(code){clearTimeout(tB);clearTimeout(tC);cm.setValue(code);codeToBlocks()}
+const EXL=[['hello','Say hello'],['ask','Ask a question'],['loop','Count with a loop'],['decide','Make a decision'],['func','Make a function']];
+EXL.forEach(([k,n])=>{const d=document.createElement('div');d.className='mi';d.textContent=n;d.onclick=()=>load(EX[k]);$('exm').appendChild(d)});
+$('exb').onclick=e=>{e.stopPropagation();const o=$('ex').classList.toggle('open');if(o){const r=$('exb').getBoundingClientRect();$('exm').style.left=r.left+'px';$('exm').style.top=r.bottom+4+'px'}};
+document.addEventListener('click',()=>$('ex').classList.remove('open'));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('ex').classList.remove('open')});
 
 /* ---------- Run (Skulpt) ---------- */
 function print(t,cls){if(cls){const s=document.createElement('span');s.className=cls;s.textContent=t;out.appendChild(s)}else out.appendChild(document.createTextNode(t));out.scrollTop=out.scrollHeight}
@@ -397,7 +388,7 @@ $('run').onclick=async()=>{
  const btn=$('run');btn.disabled=true;
  Sk.configure({output:t=>print(t),inputfunTakesPrompt:true,inputfun:p=>new Promise(res=>{const t0=Date.now();print(p||'');const i=document.createElement('input');i.className='ask';i.setAttribute('aria-label','Type your answer and press Enter');out.appendChild(i);i.focus();out.scrollTop=out.scrollHeight;i.onkeydown=e=>{if(e.key==='Enter'){const v=i.value;i.replaceWith(document.createTextNode(v+'\n'));Sk.execStart=new Date(+Sk.execStart+Date.now()-t0);res(v)}}}),__future__:Sk.python3,execLimit:8000,yieldLimit:200,
   read:x=>{if(Sk.builtinFiles===undefined||Sk.builtinFiles.files[x]===undefined)throw"File not found: '"+x+"'";return Sk.builtinFiles.files[x]}});
- try{await Sk.misceval.asyncToPromise(()=>Sk.importMainWithBody('<stdin>',false,ta.value,true))}
+ try{await Sk.misceval.asyncToPromise(()=>Sk.importMainWithBody('<stdin>',false,cm.getValue(),true))}
  catch(err){print((out.textContent&&!out.textContent.endsWith('\n')?'\n':'')+String(err),'err')}
  btn.disabled=false};
 
