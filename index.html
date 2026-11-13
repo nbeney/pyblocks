@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PyBlocks - From blocks to text</title>
+<title>PyBlocks - From Scratch to Python</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%231f2937' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z'/%3E%3Crect width='7' height='7' x='3' y='14' rx='1'/%3E%3Ccircle cx='17.5' cy='17.5' r='3.5'/%3E%3C/g%3E%3C/svg%3E">
 <style>
 *{box-sizing:border-box}
@@ -20,8 +20,8 @@ button{font:inherit;padding:6px 14px;border:0;border-radius:6px;cursor:pointer;b
 button:disabled{opacity:.4;cursor:default}
 button:focus-visible{outline:2px solid #2a6fdb;outline-offset:2px}
 iconify-icon{font-size:16px}
-#run,#exb{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px}
-#run{color:#fff;font-weight:700;min-width:110px;background:#1f9d4c}
+#run,#exb,#share{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px}
+#run{color:#fff;font-weight:700;min-width:110px;background:#1f9d4c}#run.stop{background:#d93636}
 #status{margin-left:auto;display:flex;align-items:center;gap:6px;min-width:0;font-size:13px;color:#667}
 #stxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #status iconify-icon{flex:none;color:#1f9d4c;font-size:18px}
@@ -36,11 +36,14 @@ main{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 10p
 #ed{flex:1;min-height:0}.CodeMirror{height:100%;font:14px/1.45 ui-monospace,Consolas,monospace}
 #bottom{flex:none;height:26vh;min-height:120px;padding:10px;display:flex}#bottom .pan{flex:1}
 #out{flex:1;margin:0;padding:8px;overflow:auto;background:#1b1e27;color:#e6e6e6;font:13px ui-monospace,Consolas,monospace;white-space:pre-wrap}
-#out .err{color:#ff7b72}#out .hint{color:#8b93a7}
+#out .err{color:#ff7b72}#out .ans{color:#7ee787}#out .hint{color:#8b93a7}
 #out .ask{font:inherit;color:#7ee787;background:#262a36;border:1px solid #5b6478;border-radius:4px;padding:0 6px;outline:0;min-width:12ch}
 .mini{padding:2px 8px;background:transparent;color:#667}.mini:hover{background:#e3e7ef}
-#exm{display:none;position:fixed;z-index:30;background:#fff;border:1px solid #ccd;border-radius:8px;box-shadow:0 4px 14px #0003;min-width:190px;padding:4px;font-size:13px}#ex.open #exm{display:block}
-.mi{padding:6px 10px;border-radius:5px;cursor:pointer;white-space:nowrap}.mi:hover{background:#e8f0fe}
+#exm,.sub{display:none;background:#fff;border:1px solid #ccd;border-radius:8px;box-shadow:0 4px 14px #0003;min-width:190px;padding:4px;font-size:13px}
+#exm{position:fixed;z-index:30}#ex.open #exm{display:block}
+.mi{position:relative;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:6px 10px;border-radius:5px;cursor:pointer;white-space:nowrap}.mi:hover{background:#e8f0fe}
+.sub{position:absolute;left:100%;top:-5px}.mi:hover>.sub,.mi.open>.sub{display:block}
+dialog{border:1px solid #ccd;border-radius:10px;padding:16px;width:min(560px,92vw)}#url{width:100%;padding:6px;margin:8px 0;font:12px ui-monospace,monospace}dialog div{display:flex;gap:8px}#cp,#cl{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px}
 .blocklySvg{background:#fff!important}
 .blocklyToolboxDiv{background:#eef1f7!important}
 .blocklyToolboxCategoryLabel{color:#222!important;font-family:system-ui,sans-serif;font-weight:700}
@@ -58,6 +61,7 @@ footer{flex:none;background:#fff;color:#667;border-top:1px solid #d8dce5;font-si
 <header>
   <button id="run" title="Run the program (Ctrl+Enter)"><iconify-icon icon="lucide:play"></iconify-icon> Run</button>
   <div id="ex"><button id="exb" title="Load an example">Examples <iconify-icon icon="lucide:chevron-down"></iconify-icon></button><div id="exm"></div></div>
+  <button id="share" title="Get a link to this program"><iconify-icon icon="lucide:share-2"></iconify-icon> Share</button>
   <div id="status" class="ok"><iconify-icon id="sicon" icon="lucide:circle-check"></iconify-icon><span id="stxt">Blocks and code are in sync</span></div>
 </header>
 <main>
@@ -66,6 +70,7 @@ footer{flex:none;background:#fff;color:#667;border-top:1px solid #d8dce5;font-si
 </main>
 <div id="bottom"><section class="pan"><h3>Output <button id="clear" class="mini" title="Clear output"><iconify-icon icon="lucide:eraser"></iconify-icon></button></h3><pre id="out"><span class="hint">Press Run to see what your program prints.</span></pre></section></div>
 <footer>© Nicolas Beney. Licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0 ↗</a></footer>
+<dialog id="dlg"><b>Share this program</b><p>Anyone opening this link gets your program. Nothing is uploaded or stored on a server: everything is encoded in the link itself (after the #).</p><input id="url" readonly><div><button id="cp"><iconify-icon icon="lucide:copy"></iconify-icon> Copy</button> <button id="cl">Close</button></div></dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/blockly@10.4.3/blockly_compressed.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/blockly@10.4.3/msg/en.js"></script>
@@ -75,7 +80,8 @@ footer{flex:none;background:#fff;color:#667;border-top:1px solid #d8dce5;font-si
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.1.0/dist/iconify-icon.min.js"></script>
-<script>customElements.get('iconify-icon').addCollection({"prefix":"lucide","width":24,"height":24,"icons":{"shapes":{"body":"<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z\"/><rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\"/><circle cx=\"17.5\" cy=\"17.5\" r=\"3.5\"/></g>"},"play":{"body":"<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z\"/>"},"chevron-down":{"body":"<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m6 9l6 6l6-6\"/>"},"eraser":{"body":"<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21m-7.752-9.91l8.828 8.828\"/>"},"circle-check":{"body":"<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16 9l-5.5 5.5L8 12\"/></g>"},"refresh-cw":{"body":"<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M3 12a9 9 0 0 1 9-9a9.75 9.75 0 0 1 6.74 2.74L21 8\"/><path d=\"M21 3v5h-5m5 4a9 9 0 0 1-9 9a9.75 9.75 0 0 1-6.74-2.74L3 16\"/><path d=\"M8 16H3v5\"/></g>"},"triangle-alert":{"body":"<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01\"/>"}}})</script>
+<script>customElements.get('iconify-icon').addCollection({"prefix":"lucide","width":24,"height":24,"icons":{"shapes":{"body":"<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z\"/><rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\"/><circle cx=\"17.5\" cy=\"17.5\" r=\"3.5\"/></g>"},"play":{"body":"<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z\"/>"},"chevron-down":{"body":"<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m6 9l6 6l6-6\"/>"},"eraser":{"body":"<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21m-7.752-9.91l8.828 8.828\"/>"},"circle-check":{"body":"<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16 9l-5.5 5.5L8 12\"/></g>"},"refresh-cw":{"body":"<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M3 12a9 9 0 0 1 9-9a9.75 9.75 0 0 1 6.74 2.74L21 8\"/><path d=\"M21 3v5h-5m5 4a9 9 0 0 1-9 9a9.75 9.75 0 0 1-6.74-2.74L3 16\"/><path d=\"M8 16H3v5\"/></g>"},"triangle-alert":{"body":"<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m21.73 18l-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01\"/>"},"share-2":{"body":"<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><circle cx=\"18\" cy=\"5\" r=\"3\"/><circle cx=\"6\" cy=\"12\" r=\"3\"/><circle cx=\"18\" cy=\"19\" r=\"3\"/><path d=\"m8.59 13.51l6.83 3.98m-.01-10.98l-6.82 3.98\"/></g>"},"copy":{"body":"<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"/><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"/></g>"},"chevron-right":{"body":"<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m9 18l6-6l-6-6\"/>"},"square":{"body":"<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" rx=\"2\"/>"}}})</script>
+<script src="examples.js"></script>
 <script>
 /* ---------- Block definitions ---------- */
 const iv=n=>({type:'input_value',name:n}), st=n=>({type:'input_statement',name:n});
@@ -84,7 +90,7 @@ const fi=(n,t)=>({type:'field_input',name:n,text:t});
 const SB={previousStatement:null,nextStatement:null,inputsInline:true};
 const FN=['str','int','float','len','abs','round'];
 Blockly.defineBlocksWithJsonArray([
- {type:'py_print',message0:'print( %1 )',args0:[iv('V')],colour:160,...SB},
+ 
  
  
  {type:'py_if',message0:'if %1',args0:[iv('C')],message1:'%1',args1:[st('DO')],colour:210,...SB},
@@ -103,7 +109,13 @@ Blockly.defineBlocksWithJsonArray([
  {type:'py_input',message0:'input( %1 )',args0:[iv('A')],inputsInline:true,output:null,colour:20},
  {type:'py_def',message0:'def %1 ( %2 ):',args0:[fi('NAME','say_hello'),fi('P','')],message1:'%1',args1:[st('DO')],colour:290,...SB},
  {type:'py_return',message0:'return %1',args0:[iv('V')],colour:290,...SB},
- {type:'py_comment',message0:'# %1',args0:[fi('T','my comment')],colour:'#8a94a6',...SB}
+ {type:'py_comment',message0:'# %1',args0:[fi('T','my comment')],colour:'#8a94a6',...SB},
+ {type:'py_import',message0:'import %1',args0:[dd('M',['random','time'])],colour:45,...SB},
+ {type:'py_sleep',message0:'time.sleep( %1 )',args0:[iv('A')],colour:45,...SB},
+ {type:'py_shuffle',message0:'random.shuffle( %1 )',args0:[iv('A')],colour:45,...SB},
+ {type:'py_choice',message0:'random.choice( %1 )',args0:[iv('A')],inputsInline:true,output:null,colour:45},
+ {type:'py_randint',message0:'random.randint( %1 , %2 )',args0:[iv('A'),iv('B')],inputsInline:true,output:null,colour:45},
+ {type:'py_randrange',message0:'random.randrange( %1 , %2 )',args0:[iv('A'),iv('B')],inputsInline:true,output:null,colour:45}
 ]);
 /* ---------- Variables: pick from a list, or make a new one ---------- */
 let ws;
@@ -149,15 +161,31 @@ const callMixin={
  loadExtraState(s){this.setN(s.n||0)}};
 Blockly.Blocks.py_call=Object.assign({init(){callInit(this,false)}},callMixin);
 Blockly.Blocks.py_callstmt=Object.assign({init(){callInit(this,true)}},callMixin);
+/* ---------- Blocks with a variable number of inputs: print(...) and [...] ---------- */
+const PM=s=>'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="'+s+'"/></svg>');
+function dynEnd(blk){blk.appendDummyInput('END').appendField(blk.tail)
+ .appendField(new Blockly.FieldImage(PM('M12 5v14M5 12h14'),16,16,'add',()=>{blk.setN(blk.n+1);schedBlocks()}))
+ .appendField(new Blockly.FieldImage(PM('M5 12h14'),16,16,'remove',()=>{if(blk.n>0){blk.setN(blk.n-1);schedBlocks()}}))}
+function dynInit(blk,head,tail,colour,stmt,n0){blk.tail=tail;blk.n=n0;blk.appendDummyInput('HEAD').appendField(head);
+ for(let i=0;i<n0;i++)blk.appendValueInput('A'+i);dynEnd(blk);blk.setInputsInline(true);blk.setColour(colour);
+ if(stmt){blk.setPreviousStatement(true);blk.setNextStatement(true)}else blk.setOutput(true)}
+const dynMixin={setN(n){for(let i=0;this.getInput('A'+i);i++)this.removeInput('A'+i);this.removeInput('END');this.n=n;
+  for(let i=0;i<n;i++)this.appendValueInput('A'+i);dynEnd(this)},
+ saveExtraState(){return{n:this.n}},loadExtraState(s){this.setN(s.n||0)}};
+Blockly.Blocks.py_print=Object.assign({init(){dynInit(this,'print(',')',160,true,1)}},dynMixin);
+Blockly.Blocks.py_list=Object.assign({init(){dynInit(this,'[',']',260,false,2)}},dynMixin);
+const dynArgs=b=>Array.from({length:b.n},(_,i)=>b.getInputTargetBlock('A'+i)?val(b,'A'+i)[0]:'None').join(', ');
 const sh=(type,f)=>({shadow:{type,fields:f}});
 const T=t=>sh('py_text',{T:t}), N=n=>sh('py_num',{N:n});
 const B=(type,inputs)=>({kind:'block',type,inputs});
 const toolbox={kind:'categoryToolbox',contents:[
- {kind:'category',name:'Output',colour:'160',contents:[B('py_print',{V:T('Hello!')}),B('py_comment')]},
+ {kind:'category',name:'Output',colour:'160',contents:[{kind:'block',type:'py_print',extraState:{n:1},inputs:{A0:T('Hello!')}},B('py_comment')]},
  {kind:'category',name:'Variables',colour:'330',custom:'PYVARS'},
  {kind:'category',name:'Logic',colour:'210',contents:[B('py_if'),B('py_ifelse'),B('py_cmp',{A:N(0),B:N(0)}),B('py_logic'),B('py_not'),B('py_bool')]},
  {kind:'category',name:'Loops',colour:'120',contents:[B('py_for',{N:N(10)}),B('py_while')]},
  {kind:'category',name:'Functions',colour:'290',custom:'PYFUNCS'},
+ {kind:'category',name:'Modules',colour:'45',contents:[B('py_import'),B('py_sleep',{A:N(1)}),B('py_choice'),B('py_shuffle'),B('py_randint',{A:N(1),B:N(10)}),B('py_randrange',{A:N(0),B:N(10)})]},
+ {kind:'category',name:'Lists',colour:'260',contents:[{kind:'block',type:'py_list',extraState:{n:3},inputs:{A0:T('a'),A1:T('b'),A2:T('c')}}]},
  {kind:'category',name:'Math',colour:'230',contents:[B('py_num'),B('py_math',{A:N(1),B:N(1)}),B('py_fn')]},
  {kind:'category',name:'Text',colour:'20',contents:[B('py_text'),B('py_input',{A:T('What is your name? ')})]}
 ]};
@@ -176,6 +204,10 @@ function expr(b){const op=b.getFieldValue('OP');
   case 'py_cmp':return[wrap(val(b,'A'),5)+` ${op} `+wrap(val(b,'B'),5),4];
   case 'py_logic':{const p=op==='and'?2:1;return[wrap(val(b,'A'),p)+` ${op} `+wrap(val(b,'B'),p+1),p]}
   case 'py_not':return['not '+wrap(val(b,'A'),3),3];
+  case 'py_list':return['['+dynArgs(b)+']',10];
+  case 'py_choice':return[`random.choice(${val(b,'A')[0]})`,10];
+  case 'py_randint':return[`random.randint(${val(b,'A')[0]}, ${val(b,'B')[0]})`,10];
+  case 'py_randrange':return[`random.randrange(${val(b,'A')[0]}, ${val(b,'B')[0]})`,10];
   case 'py_call':return[callCode(b),10];
   case 'py_input':return[`input(${b.getInputTargetBlock('A')?val(b,'A')[0]:''})`,10];
   case 'py_fn':return[`${b.getFieldValue('F')}(${val(b,'A')[0]})`,10];
@@ -188,7 +220,10 @@ function ifGen(b,ind,kw){const pad='    '.repeat(ind);let s=`${pad}${kw} ${val(b
  return s}
 function stmt(b,ind){const pad='    '.repeat(ind);
  switch(b.type){
-  case 'py_print':return pad+`print(${b.getInputTargetBlock('V')?val(b,'V')[0]:''})\n`;
+  case 'py_print':return pad+`print(${dynArgs(b)})\n`;
+  case 'py_import':return pad+`import ${b.getFieldValue('M')}\n`;
+  case 'py_sleep':return pad+`time.sleep(${val(b,'A')[0]})\n`;
+  case 'py_shuffle':return pad+`random.shuffle(${val(b,'A')[0]})\n`;
   case 'py_set':return pad+`${nm(b)} = ${val(b,'V')[0]}\n`;
   case 'py_change':return pad+`${nm(b)} += ${val(b,'V')[0]}\n`;
   case 'py_if':case 'py_ifelse':return ifGen(b,ind,'if');
@@ -214,7 +249,7 @@ function tokenize(src){const lines=[];hasComment=false;
    if(m=s.match(/^(\d+\.?\d*|\.\d+)/))toks.push({k:'num',v:parseFloat(m[0])});
    else if(m=s.match(/^"((?:[^"\\]|\\.)*)"|^'((?:[^'\\]|\\.)*)'/))toks.push({k:'str',v:unesc(m[1]!==undefined?m[1]:m[2])});
    else if(m=s.match(/^[A-Za-z_]\w*/))toks.push({k:'id',v:m[0]});
-   else if(m=s.match(/^(==|!=|<=|>=|\/\/|\+=|-=|[-+*\/%<>=():,])/))toks.push({k:'op',v:m[0]});
+   else if(m=s.match(/^(==|!=|<=|>=|\/\/|\+=|-=|[-+*\/%<>=():,.\[\]])/))toks.push({k:'op',v:m[0]});
    else throw{line:i+1,msg:`blocks don’t know the character “${s[0]}”`};
    s=s.slice(m[0].length)}
   lines.push({n:i+1,indent,toks})});
@@ -243,8 +278,13 @@ class P{
  atom(){const x=this.peek();if(!x)this.fail('something is missing here');this.i++;
   if(x.k==='num')return{t:'num',v:x.v};
   if(x.k==='str')return{t:'str',v:x.v};
+  if(x.k==='op'&&x.v==='['){const items=[];if(!this.is(']')){do items.push(this.or());while(this.eat(','))}this.need(']');return{t:'list',items}}
   if(x.k==='op'&&x.v==='('){const e=this.or();this.need(')');return e}
   if(x.k==='id'){
+   if((x.v==='random'||x.v==='time')&&this.is('.')){this.i++;const m=this.peek();if(!m||m.k!=='id')this.fail('I expected a function name after the dot');this.i++;
+    const f=x.v+'.'+m.v;if(!MODS[f])this.fail(`there’s no block for ${f}() here`);this.need('(');let args=this.args();
+    if(f==='random.randrange'&&args.length===1)args=[{t:'num',v:0},args[0]];
+    if(args.length!==MODS[f])this.fail(`${f}() needs ${MODS[f]} value${MODS[f]>1?'s':''} for its block`);return{t:'mod',f,args}}
    if(x.v==='True'||x.v==='False')return{t:'bool',v:x.v};
    if(x.v==='None')return{t:'none'};
    if(x.v==='input'&&this.is('(')){this.i++;let a={t:'none'};if(!this.is(')'))a=this.or();if(this.is(','))this.fail('input() takes one prompt');this.need(')');return{t:'input',a}}
@@ -268,9 +308,7 @@ function parseBlock(lines,i,indent){const out=[];
  while(i<lines.length&&lines[i].indent===indent){
   if(lines[i].cm!==undefined){out.push({t:'comment',text:lines[i++].cm});continue}
   const L=lines[i++],p=new P(L.toks,L.n),f=p.peek();let kw=f.k==='id'?f.v:'';
-  if(kw==='print'&&L.toks[1]&&L.toks[1].v==='('){p.i=2;let e={t:'none'};
-   if(!p.is(')')){e=p.or();if(p.is(','))p.fail('a print block shows one thing — join pieces with + and str()')}
-   p.need(')');p.end();out.push({t:'print',e})}
+  if(kw==='print'&&L.toks[1]&&L.toks[1].v==='('){p.i=2;const args=p.args();p.end();out.push({t:'print',args})}
   else if(kw==='if'){p.i=1;const[nd,j]=ifS(lines,i,indent,p,L.n);out.push(nd);i=j}
   else if(kw==='while'){p.i=1;const c=p.or();p.need(':');p.end();const[body,j]=sub(lines,i,indent,L.n);out.push({t:'while',c,body});i=j}
   else if(kw==='for'){p.i=1;const v=p.peek();if(!v||v.k!=='id')p.fail('I expected a variable name after “for”');p.i++;
@@ -281,6 +319,8 @@ function parseBlock(lines,i,indent){const out=[];
    p.need(')');p.need(':');p.end();const[body,j]=sub(lines,i,indent,L.n);out.push({t:'def',name:nt.v,params:ps,body});i=j}
   else if(kw==='return'){p.i=1;let e={t:'none'};if(p.peek())e=p.or();p.end();out.push({t:'return',e})}
   else if(kw&&DEFS.has(kw)&&L.toks[1]&&L.toks[1].v==='('){p.i=2;const args=p.args();p.end();out.push({t:'callstmt',f:kw,args})}
+  else if(kw==='import'){p.i=1;const m=p.peek();if(!m||m.k!=='id'||!['random','time'].includes(m.v))p.fail('blocks only know “import random” and “import time”');p.i++;p.end();out.push({t:'import',m:m.v})}
+  else if(L.toks[1]&&L.toks[1].v==='.'&&['time.sleep','random.shuffle'].includes(kw+'.'+(L.toks[2]||{}).v)){p.i=3;p.need('(');const e=p.or();p.need(')');p.end();out.push({t:L.toks[2].v,e})}
   else if(kw==='pass'){p.i=1;p.end()}
   else if(kw&&L.toks[1]&&(L.toks[1].v==='='||L.toks[1].v==='+=')){const op=L.toks[1].v;p.i=2;const e=p.or();p.end();out.push({t:op==='='?'set':'change',n:kw,e})}
   else p.fail(kw&&L.toks[1]&&L.toks[1].v==='('?`there’s no block for ${kw}() yet`:'blocks can’t show this line yet');
@@ -288,6 +328,7 @@ function parseBlock(lines,i,indent){const out=[];
  if(i<lines.length&&lines[i].indent>indent)throw{line:lines[i].n,msg:'unexpected indent'};
  return[out,i]}
 const DEFS=new Set();
+const MODS={'random.choice':1,'random.randint':2,'random.randrange':2};
 function parse(src){const lines=tokenize(src);if(!lines.length)return[];
  DEFS.clear();lines.forEach(l=>{if(l.toks&&l.toks[0].v==='def'&&l.toks[1])DEFS.add(l.toks[1].v)});
  if(lines[0].indent)throw{line:lines[0].n,msg:'unexpected indent'};
@@ -307,14 +348,19 @@ function val2(n){let b;switch(n.t){
  case 'cmp':b=mk('py_cmp');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'logic':b=mk('py_logic');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'not':b=mk('py_not');put(b,'A',n.a);break;
+ case 'list':b=mk('py_list');b.setN(n.items.length);n.items.forEach((a,i)=>put(b,'A'+i,a));break;
+ case 'mod':{b=mk({'random.choice':'py_choice','random.randint':'py_randint','random.randrange':'py_randrange'}[n.f]);n.args.forEach((a,i)=>put(b,i?'B':'A',a));break}
  case 'call':b=mk('py_call');b.setFieldValue(n.f,'F');b.setN(n.args.length);n.args.forEach((a,i)=>put(b,'A'+i,a));break;
  case 'input':b=mk('py_input');put(b,'A',n.a);break;
  case 'fn':b=mk('py_fn');b.setFieldValue(n.f,'F');put(b,'A',n.a);break}
  return b}
 function stmt2(s){let b;switch(s.t){
- case 'print':b=mk('py_print');put(b,'V',s.e);break;
+ case 'print':b=mk('py_print');b.setN(s.args.length);s.args.forEach((a,i)=>put(b,'A'+i,a));break;
  case 'set':case 'change':b=mk(s.t==='set'?'py_set':'py_change');b.setFieldValue(s.n,'N');put(b,'V',s.e);break;
  case 'if':b=mk(s.el?'py_ifelse':'py_if');put(b,'C',s.c);putS(b,'DO',s.th);if(s.el)putS(b,'EL',s.el);break;
+ case 'import':b=mk('py_import');b.setFieldValue(s.m,'M');break;
+ case 'sleep':b=mk('py_sleep');put(b,'A',s.e);break;
+ case 'shuffle':b=mk('py_shuffle');put(b,'A',s.e);break;
  case 'comment':b=mk('py_comment');b.setFieldValue(s.text,'T');break;
  case 'def':b=mk('py_def');b.setFieldValue(s.name,'NAME');b.setFieldValue(s.params.join(', '),'P');putS(b,'DO',s.body);break;
  case 'return':b=mk('py_return');put(b,'V',s.e);break;
@@ -361,40 +407,76 @@ function codeToBlocks(){pC=false;
  try{rebuild(parse(cm.getValue()));if(hasComment)setStatus('warn','Your code has comments. Blocks can’t show them — editing the blocks will remove them.');else setStatus('ok')}
  catch(e){if(!e||!e.line)throw e;
   setStatus('warn',`Line ${e.line}: ${e.msg}. Blocks show your last working version — editing them will replace your code.`)}}
-ws.addChangeListener(e=>{if(e.isUiEvent)return;pB=true;setStatus('syncing');clearTimeout(tB);tB=setTimeout(blocksToCode,350)});
+function schedBlocks(){pB=true;setStatus('syncing');clearTimeout(tB);tB=setTimeout(blocksToCode,350)}
+ws.addChangeListener(e=>{if(!e.isUiEvent)schedBlocks()});
 cm.on('change',(_,c)=>{if(c.origin==='setValue')return;pC=true;setStatus('syncing');clearTimeout(tC);tC=setTimeout(codeToBlocks,700)});
 
-const EX={
- func:'def greet(name):\n    print("Hello, " + name + "!")\n\ndef double(n):\n    return n * 2\n\ngreet("Sam")\nprint(double(21))\n',
- ask:'name = input("What is your name? ")\nprint("Hello, " + name + "!")\n',
- hello:'name = "Sam"\nprint("Hello, " + name + "!")\n',
- loop:'total = 0\nfor i in range(5):\n    total += i\n    print(i)\nprint("Total: " + str(total))\n',
- decide:'score = 0\nfor i in range(3):\n    score += 10\nname = "Sam"\nif score > 20:\n    print(name + " did great!")\nelif score > 10:\n    print("Nice try")\nelse:\n    print("Keep practising")\n'};
 function load(code){clearTimeout(tB);clearTimeout(tC);cm.setValue(code);codeToBlocks()}
-const EXL=[['hello','Say hello'],['ask','Ask a question'],['loop','Count with a loop'],['decide','Make a decision'],['func','Make a function']];
-EXL.forEach(([k,n])=>{const d=document.createElement('div');d.className='mi';d.textContent=n;d.onclick=()=>load(EX[k]);$('exm').appendChild(d)});
-$('exb').onclick=e=>{e.stopPropagation();const o=$('ex').classList.toggle('open');if(o){const r=$('exb').getBoundingClientRect();$('exm').style.left=r.left+'px';$('exm').style.top=r.bottom+4+'px'}};
-document.addEventListener('click',()=>$('ex').classList.remove('open'));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')$('ex').classList.remove('open')});
+/* Examples menu (built from window.PB_EXAMPLES, see examples.js) */
+const exm=$('exm');
+const closeEx=()=>{$('ex').classList.remove('open');exm.querySelectorAll('.mi.open').forEach(m=>m.classList.remove('open'))};
+for(const [g,list] of Object.entries(window.PB_EXAMPLES||{})){
+ const mi=document.createElement('div');mi.className='mi';
+ const lbl=document.createElement('span');lbl.textContent=g;mi.appendChild(lbl);
+ const ch=document.createElement('iconify-icon');ch.setAttribute('icon','lucide:chevron-right');mi.appendChild(ch);
+ const sub=document.createElement('div');sub.className='sub';
+ list.forEach(x=>{const it=document.createElement('div');it.className='mi';it.textContent=x.title;
+  it.onclick=e=>{e.stopPropagation();load(x.code);closeEx();cm.focus()};sub.appendChild(it)});
+ mi.appendChild(sub);mi.onclick=e=>{e.stopPropagation();mi.classList.toggle('open')};exm.appendChild(mi)}
+$('exb').onclick=e=>{e.stopPropagation();if($('ex').classList.toggle('open')){const r=$('exb').getBoundingClientRect();exm.style.left=r.left+'px';exm.style.top=(r.bottom+4)+'px'}else closeEx()};
+document.addEventListener('click',closeEx);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeEx()});
 
-/* ---------- Run (Skulpt) ---------- */
-function print(t,cls){if(cls){const s=document.createElement('span');s.className=cls;s.textContent=t;out.appendChild(s)}else out.appendChild(document.createTextNode(t));out.scrollTop=out.scrollHeight}
+/* ---------- Run / Stop (Skulpt) ---------- */
+const MAXOUT=100000;let outLen=0,running=false,stopping=false,capped=false,cancelInput=null;
+function emit(t,cls){if(capped)return;outLen+=t.length;
+ if(cls){const s=document.createElement('span');s.className=cls;s.textContent=t;out.appendChild(s)}else out.appendChild(document.createTextNode(t));
+ out.scrollTop=out.scrollHeight;
+ if(outLen>MAXOUT){capped=true;emit0('\nToo much output — the program was stopped.','err');stopRun()}}
+function emit0(t,cls){const s=document.createElement('span');s.className=cls;s.textContent=t;out.appendChild(s)}
+function setRun(on){running=on;const b=$('run');b.classList.toggle('stop',on);
+ b.innerHTML=on?'<iconify-icon icon="lucide:square"></iconify-icon> Stop':'<iconify-icon icon="lucide:play"></iconify-icon> Run';
+ b.title=on?'Stop the program':'Run the program (Ctrl+Enter)'}
+function stopRun(){if(!running||stopping)return;stopping=true;Sk.execLimit=0;if(cancelInput)cancelInput()}
 $('clear').onclick=()=>out.textContent='';
-$('run').onclick=async()=>{
+async function runProg(){
  if(pB){clearTimeout(tB);blocksToCode()}
  if(pC){clearTimeout(tC);codeToBlocks()}
- out.textContent='';
- if(typeof Sk==='undefined'){print('The Python engine could not load. Check your connection and reload.','err');return}
- const btn=$('run');btn.disabled=true;
- Sk.configure({output:t=>print(t),inputfunTakesPrompt:true,inputfun:p=>new Promise(res=>{const t0=Date.now();print(p||'');const i=document.createElement('input');i.className='ask';i.setAttribute('aria-label','Type your answer and press Enter');out.appendChild(i);i.focus();out.scrollTop=out.scrollHeight;i.onkeydown=e=>{if(e.key==='Enter'){const v=i.value;i.replaceWith(document.createTextNode(v+'\n'));Sk.execStart=new Date(+Sk.execStart+Date.now()-t0);res(v)}}}),__future__:Sk.python3,execLimit:8000,yieldLimit:200,
+ out.textContent='';outLen=0;stopping=false;capped=false;
+ if(typeof Sk==='undefined'){emit('The Python engine could not load. Check your connection and reload.','err');return}
+ setRun(true);
+ Sk.configure({output:t=>emit(t),inputfunTakesPrompt:true,execLimit:Number.POSITIVE_INFINITY,yieldLimit:100,__future__:Sk.python3,
+  inputfun:p=>new Promise((res,rej)=>{emit(p||'');const i=document.createElement('input');i.className='ask';
+   i.setAttribute('aria-label','Type your answer and press Enter');out.appendChild(i);i.focus();out.scrollTop=out.scrollHeight;
+   cancelInput=()=>{i.remove();cancelInput=null;rej(new Error('stopped'))};
+   i.onkeydown=e=>{if(e.key==='Enter'){const s=document.createElement('span');s.className='ans';s.textContent=i.value+'\n';
+    const v=i.value;i.replaceWith(s);cancelInput=null;res(v)}}}),
   read:x=>{if(Sk.builtinFiles===undefined||Sk.builtinFiles.files[x]===undefined)throw"File not found: '"+x+"'";return Sk.builtinFiles.files[x]}});
  try{await Sk.misceval.asyncToPromise(()=>Sk.importMainWithBody('<stdin>',false,cm.getValue(),true))}
- catch(err){print((out.textContent&&!out.textContent.endsWith('\n')?'\n':'')+String(err),'err')}
- btn.disabled=false};
+ catch(err){const nl=out.textContent&&!out.textContent.endsWith('\n')?'\n':'';
+  if(stopping)emit0(nl+'Program stopped.','hint');else if(!capped)emit(nl+String(err),'err')}
+ cancelInput=null;stopping=false;setRun(false)}
+$('run').onclick=()=>running?stopRun():runProg();
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();e.stopPropagation();if(!running)runProg()}},true);
 
-document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();e.stopPropagation();if(!$('run').disabled)$('run').click()}},true);
-
-load(EX.decide);
+/* ---------- Share: the program is compressed into the link (after the #) ---------- */
+const pipe=async(d,st)=>new Uint8Array(await new Response(new Blob([d]).stream().pipeThrough(st)).arrayBuffer());
+const toHex=u=>Array.from(u,b=>b.toString(16).padStart(2,'0')).join('');
+const fromHex=h=>Uint8Array.from(h.match(/../g),x=>parseInt(x,16));
+const cpBtn=s=>$('cp').innerHTML='<iconify-icon icon="lucide:copy"></iconify-icon> '+s;
+$('share').onclick=async()=>{
+ if(typeof CompressionStream==='undefined'){alert('Sharing needs a newer browser. Please upgrade your browser.');return}
+ if(pB){clearTimeout(tB);blocksToCode()}
+ if(pC){clearTimeout(tC);codeToBlocks()}
+ const u=await pipe(new TextEncoder().encode(JSON.stringify({c:cm.getValue()})),new CompressionStream('deflate-raw'));
+ $('url').value=location.href.split('#')[0]+'#'+toHex(u);cpBtn('Copy');$('dlg').showModal();$('url').select()};
+$('cp').onclick=async()=>{$('url').select();try{await navigator.clipboard.writeText($('url').value)}catch(e){document.execCommand('copy')}cpBtn('Copied!')};
+$('cl').onclick=()=>$('dlg').close();
+(async()=>{const h=location.hash.slice(1);let code=null;
+ if(/^([0-9a-f]{2})+$/.test(h)&&typeof DecompressionStream!=='undefined'){
+  try{code=JSON.parse(new TextDecoder().decode(await pipe(fromHex(h),new DecompressionStream('deflate-raw')))).c}catch(e){}}
+ const first=((window.PB_EXAMPLES||{}).Decisions||[{code:''}])[0].code;
+ load(typeof code==='string'?code:first)})();
 </script>
 </body>
 </html>
