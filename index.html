@@ -57,7 +57,7 @@ footer{flex:none;background:#fff;color:#667;border-top:1px solid #d8dce5;font-si
 </style>
 </head>
 <body>
-<div id="menubar"><span>PY</span>BLOCKS <iconify-icon icon="lucide:shapes"></iconify-icon><small>From blocks to text</small></div>
+<div id="menubar"><span>PY</span>BLOCKS <iconify-icon icon="lucide:shapes"></iconify-icon><small>From blocks to Python</small></div>
 <header>
   <button id="run" title="Run the program (Ctrl+Enter)"><iconify-icon icon="lucide:play"></iconify-icon> Run</button>
   <div id="ex"><button id="exb" title="Load an example">Examples <iconify-icon icon="lucide:chevron-down"></iconify-icon></button><div id="exm"></div></div>
@@ -66,7 +66,7 @@ footer{flex:none;background:#fff;color:#667;border-top:1px solid #d8dce5;font-si
 </header>
 <main>
   <section class="pan" id="bpane"><h3>Blocks</h3><div class="fill"><div id="blockly"></div></div></section>
-  <section class="pan"><h3>Python code (Ctrl-Enter)</h3><div id="ed"></div></section>
+  <section class="pan"><h3>Python</h3><div id="ed"></div></section>
 </main>
 <div id="bottom"><section class="pan"><h3>Output <button id="clear" class="mini" title="Clear output"><iconify-icon icon="lucide:eraser"></iconify-icon></button></h3><pre id="out"><span class="hint">Press Run to see what your program prints.</span></pre></section></div>
 <footer>© Nicolas Beney. Licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0 ↗</a></footer>
@@ -414,6 +414,7 @@ cm.on('change',(_,c)=>{if(c.origin==='setValue')return;pC=true;setStatus('syncin
 function load(code){clearTimeout(tB);clearTimeout(tC);cm.setValue(code);codeToBlocks()}
 /* Examples menu (built from window.PB_EXAMPLES, see examples.js) */
 const exm=$('exm');
+if(!Object.keys(window.PB_EXAMPLES||{}).length){const n=document.createElement('div');n.className='mi';n.textContent='examples.js not found';n.style.opacity='.5';exm.appendChild(n)}
 const closeEx=()=>{$('ex').classList.remove('open');exm.querySelectorAll('.mi.open').forEach(m=>m.classList.remove('open'))};
 for(const [g,list] of Object.entries(window.PB_EXAMPLES||{})){
  const mi=document.createElement('div');mi.className='mi';
@@ -475,7 +476,7 @@ $('cl').onclick=()=>$('dlg').close();
 (async()=>{const h=location.hash.slice(1);let code=null;
  if(/^([0-9a-f]{2})+$/.test(h)&&typeof DecompressionStream!=='undefined'){
   try{code=JSON.parse(new TextDecoder().decode(await pipe(fromHex(h),new DecompressionStream('deflate-raw')))).c}catch(e){}}
- const first=((window.PB_EXAMPLES||{}).Decisions||[{code:''}])[0].code;
+ const first=((window.PB_EXAMPLES||{}).Basics||[{code:''}])[0].code;
  load(typeof code==='string'?code:first)})();
 </script>
 </body>

@@ -2,11 +2,13 @@
    The Examples menu builds itself from this object (one sub-menu per group). */
 window.PB_EXAMPLES = {
   'Basics': [
-    { title: 'Say hello', code: `name = "Sam"
-print("Hello,", name + "!")
+    { title: 'Ask a question', code: `name = input("What is your name? 😊 ")
+print("Hello,", name + "! 👋")
+print("Nice to meet you 🌟")
+print("Let's have fun learning Python together 🐍🎉")
 ` },
-    { title: 'Ask a question', code: `name = input("What is your name? ")
-print("Hello,", name + "!")
+    { title: 'Say hello', code: `name = "Sam"
+print("Hello,", name + "! 👋")
 ` },
     { title: 'Maths with variables', code: `apples = 5
 price = 0.5
