@@ -396,6 +396,8 @@ const $=id=>document.getElementById(id);
 const out=$('out');
 ws=Blockly.inject('blockly',{toolbox,renderer:'zelos',trashcan:true,
  zoom:{controls:true,wheel:false,startScale:.95},grid:{spacing:24,length:3,colour:'#8884',snap:true},move:{scrollbars:true,drag:true,wheel:true}});
+// Close the open toolbox category when the user clicks anywhere outside the Blockly area.
+document.addEventListener('pointerdown',e=>{if($('blockly').contains(e.target))return;const t=ws.getToolbox();if(t&&t.getSelectedItem())t.clearSelection()},true);
 ws.registerToolboxCategoryCallback('PYFUNCS',()=>{
  const L=[{kind:'block',type:'py_def',fields:{NAME:'say_hello',P:''}}];
  funcNames().forEach(f=>{const k=defParams(f)||0,x={F:f},ex={n:k};
