@@ -126,6 +126,8 @@ Blockly.defineBlocksWithJsonArray([
  {type:'py_def',message0:'def %1 ( %2 ):',args0:[fi('NAME','say_hello'),fi('P','')],message1:'%1',args1:[st('DO')],colour:290,...SB},
  {type:'py_return',message0:'return %1',args0:[iv('V')],colour:290,...SB},
  {type:'py_comment',message0:'# %1',args0:[fi('T','my comment')],colour:'#8a94a6',...SB},
+ {type:'py_pass',message0:'pass',colour:'#8a94a6',...SB},
+ {type:'py_ellipsis',message0:'...',colour:'#8a94a6',...SB},
  {type:'py_import',message0:'import %1',args0:[dd('M',['random','time'])],colour:45,...SB},
  {type:'py_sleep',message0:'time.sleep( %1 )',args0:[iv('A')],colour:45,...SB},
  {type:'py_shuffle',message0:'random.shuffle( %1 )',args0:[iv('A')],colour:45,...SB},
@@ -195,7 +197,7 @@ const sh=(type,f)=>({shadow:{type,fields:f}});
 const T=t=>sh('py_text',{T:t}), N=n=>sh('py_num',{N:n});
 const B=(type,inputs)=>({kind:'block',type,inputs});
 const toolbox={kind:'categoryToolbox',contents:[
- {kind:'category',name:'Output',colour:'160',contents:[{kind:'block',type:'py_print',extraState:{n:1},inputs:{A0:T('Hello!')}},B('py_comment')]},
+ {kind:'category',name:'Output',colour:'160',contents:[{kind:'block',type:'py_print',extraState:{n:1},inputs:{A0:T('Hello!')}}]},
  {kind:'category',name:'Variables',colour:'330',custom:'PYVARS'},
  {kind:'category',name:'Logic',colour:'210',contents:[B('py_if'),B('py_ifelse'),B('py_cmp',{A:N(0),B:N(0)}),B('py_logic'),B('py_not'),B('py_bool')]},
  {kind:'category',name:'Loops',colour:'120',contents:[B('py_for',{N:N(10)}),B('py_while')]},
@@ -203,7 +205,8 @@ const toolbox={kind:'categoryToolbox',contents:[
  {kind:'category',name:'Modules',colour:'45',contents:[B('py_import'),B('py_sleep',{A:N(1)}),B('py_choice'),B('py_shuffle'),B('py_randint',{A:N(1),B:N(10)}),B('py_randrange',{A:N(0),B:N(10)})]},
  {kind:'category',name:'Lists',colour:'260',contents:[{kind:'block',type:'py_list',extraState:{n:3},inputs:{A0:T('a'),A1:T('b'),A2:T('c')}}]},
  {kind:'category',name:'Math',colour:'230',contents:[B('py_num'),B('py_math',{A:N(1),B:N(1)}),B('py_fn')]},
- {kind:'category',name:'Text',colour:'20',contents:[B('py_text'),B('py_input',{A:T('What is your name? ')})]}
+ {kind:'category',name:'Text',colour:'20',contents:[B('py_text'),B('py_input',{A:T('What is your name? ')})]},
+ {kind:'category',name:'Others',colour:'#8a94a6',contents:[B('py_comment'),B('py_pass'),B('py_ellipsis')]}
 ]};
 
 /* ---------- Blocks -> Python ---------- */
@@ -243,6 +246,8 @@ function stmt(b,ind){const pad='    '.repeat(ind);
   case 'py_set':return pad+`${nm(b)} = ${val(b,'V')[0]}\n`;
   case 'py_change':return pad+`${nm(b)} += ${val(b,'V')[0]}\n`;
   case 'py_if':case 'py_ifelse':return ifGen(b,ind,'if');
+  case 'py_pass':return pad+'pass\n';
+  case 'py_ellipsis':return pad+'...\n';
   case 'py_comment':return pad+'# '+String(b.getFieldValue('T')).replace(/\n/g,' ')+'\n';
   case 'py_callstmt':return pad+callCode(b)+'\n';
   case 'py_return':return pad+'return'+(b.getInputTargetBlock('V')?' '+val(b,'V')[0]:'')+'\n';
@@ -265,7 +270,7 @@ function tokenize(src){const lines=[];hasComment=false;
    if(m=s.match(/^(\d+\.?\d*|\.\d+)/))toks.push({k:'num',v:parseFloat(m[0])});
    else if(m=s.match(/^"((?:[^"\\]|\\.)*)"|^'((?:[^'\\]|\\.)*)'/))toks.push({k:'str',v:unesc(m[1]!==undefined?m[1]:m[2])});
    else if(m=s.match(/^[A-Za-z_]\w*/))toks.push({k:'id',v:m[0]});
-   else if(m=s.match(/^(==|!=|<=|>=|\/\/|\+=|-=|[-+*\/%<>=():,.\[\]])/))toks.push({k:'op',v:m[0]});
+   else if(m=s.match(/^(\.\.\.|==|!=|<=|>=|\/\/|\+=|-=|[-+*\/%<>=():,.\[\]])/))toks.push({k:'op',v:m[0]});
    else throw{line:i+1,msg:`blocks don’t know the character “${s[0]}”`};
    s=s.slice(m[0].length)}
   lines.push({n:i+1,indent,toks})});
@@ -337,7 +342,8 @@ function parseBlock(lines,i,indent){const out=[];
   else if(kw&&DEFS.has(kw)&&L.toks[1]&&L.toks[1].v==='('){p.i=2;const args=p.args();p.end();out.push({t:'callstmt',f:kw,args})}
   else if(kw==='import'){p.i=1;const m=p.peek();if(!m||m.k!=='id'||!['random','time'].includes(m.v))p.fail('blocks only know “import random” and “import time”');p.i++;p.end();out.push({t:'import',m:m.v})}
   else if(L.toks[1]&&L.toks[1].v==='.'&&['time.sleep','random.shuffle'].includes(kw+'.'+(L.toks[2]||{}).v)){p.i=3;p.need('(');const e=p.or();p.need(')');p.end();out.push({t:L.toks[2].v,e})}
-  else if(kw==='pass'){p.i=1;p.end()}
+  else if(f.v==='...'){p.i=1;p.end();out.push({t:'ellipsis'})}
+  else if(kw==='pass'){p.i=1;p.end();out.push({t:'pass'})}
   else if(kw&&L.toks[1]&&(L.toks[1].v==='='||L.toks[1].v==='+=')){const op=L.toks[1].v;p.i=2;const e=p.or();p.end();out.push({t:op==='='?'set':'change',n:kw,e})}
   else p.fail(kw&&L.toks[1]&&L.toks[1].v==='('?`there’s no block for ${kw}() yet`:'blocks can’t show this line yet');
  }
@@ -377,6 +383,8 @@ function stmt2(s){let b;switch(s.t){
  case 'import':b=mk('py_import');b.setFieldValue(s.m,'M');break;
  case 'sleep':b=mk('py_sleep');put(b,'A',s.e);break;
  case 'shuffle':b=mk('py_shuffle');put(b,'A',s.e);break;
+ case 'pass':b=mk('py_pass');break;
+ case 'ellipsis':b=mk('py_ellipsis');break;
  case 'comment':b=mk('py_comment');b.setFieldValue(s.text,'T');break;
  case 'def':b=mk('py_def');b.setFieldValue(s.name,'NAME');b.setFieldValue(s.params.join(', '),'P');putS(b,'DO',s.body);break;
  case 'return':b=mk('py_return');put(b,'V',s.e);break;
