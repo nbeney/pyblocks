@@ -119,6 +119,7 @@ Blockly.defineBlocksWithJsonArray([
  
  {type:'py_math',message0:'%1 %2 %3',args0:[iv('A'),dd('OP',['+','-','*','/','//','%']),iv('B')],inputsInline:true,output:null,colour:230},
  {type:'py_cmp',message0:'%1 %2 %3',args0:[iv('A'),dd('OP',['==','!=','<','>','<=','>=']),iv('B')],inputsInline:true,output:'Boolean',colour:210},
+ {type:'py_in',message0:'%1 %2 %3',args0:[iv('A'),dd('OP',['in','not in']),iv('B')],inputsInline:true,output:'Boolean',colour:210},
  {type:'py_logic',message0:'%1 %2 %3',args0:[iv('A'),dd('OP',['and','or']),iv('B')],inputsInline:true,output:'Boolean',colour:210},
  {type:'py_not',message0:'not %1',args0:[iv('A')],output:'Boolean',colour:210},
  {type:'py_fn',message0:'%1 ( %2 )',args0:[dd('F',FN),iv('A')],inputsInline:true,output:null,colour:20},
@@ -204,7 +205,7 @@ const B=(type,inputs)=>({kind:'block',type,inputs});
 const toolbox={kind:'categoryToolbox',contents:[
  {kind:'category',name:'Output',colour:'160',contents:[{kind:'block',type:'py_print',extraState:{n:1},inputs:{A0:T('Hello!')}}]},
  {kind:'category',name:'Variables',colour:'330',custom:'PYVARS'},
- {kind:'category',name:'Logic',colour:'210',contents:[B('py_if'),B('py_ifelse'),B('py_cmp',{A:N(0),B:N(0)}),B('py_logic'),B('py_not'),B('py_bool')]},
+ {kind:'category',name:'Logic',colour:'210',contents:[B('py_if'),B('py_ifelse'),B('py_cmp',{A:N(0),B:N(0)}),B('py_in'),B('py_logic'),B('py_not'),B('py_bool')]},
  {kind:'category',name:'Loops',colour:'120',contents:[B('py_for'),{kind:'block',type:'py_range',extraState:{n:1},inputs:{A0:N(10)}},B('py_while')]},
  {kind:'category',name:'Functions',colour:'290',custom:'PYFUNCS'},
  {kind:'category',name:'Modules',colour:'45',contents:[B('py_import'),B('py_sleep',{A:N(1)}),B('py_choice'),B('py_shuffle'),B('py_randint',{A:N(1),B:N(10)}),B('py_randrange',{A:N(0),B:N(10)})]},
@@ -225,6 +226,7 @@ function expr(b){const op=b.getFieldValue('OP');
   case 'py_bool':return[b.getFieldValue('V'),10];
   case 'py_var':return[nm(b),10];
   case 'py_math':{const p=(op==='+'||op==='-')?5:6;return[wrap(val(b,'A'),p)+` ${op} `+wrap(val(b,'B'),p+1),p]}
+  case 'py_in':return[wrap(val(b,'A'),5)+` ${op} `+wrap(val(b,'B'),5),4];
   case 'py_cmp':return[wrap(val(b,'A'),5)+` ${op} `+wrap(val(b,'B'),5),4];
   case 'py_logic':{const p=op==='and'?2:1;return[wrap(val(b,'A'),p)+` ${op} `+wrap(val(b,'B'),p+1),p]}
   case 'py_not':return['not '+wrap(val(b,'A'),3),3];
@@ -296,7 +298,10 @@ class P{
  and(){let a=this.not();while(this.eat('and'))a={t:'logic',op:'and',a,b:this.not()};return a}
  not(){return this.eat('not')?{t:'not',a:this.not()}:this.cmp()}
  cmp(){const a=this.sum(),x=this.peek();
-  if(x&&x.k==='op'&&['==','!=','<','>','<=','>='].includes(x.v)){this.i++;return{t:'cmp',op:x.v,a,b:this.sum()}}return a}
+  if(x&&x.k==='op'&&['==','!=','<','>','<=','>='].includes(x.v)){this.i++;return{t:'cmp',op:x.v,a,b:this.sum()}}
+  if(this.eat('in'))return{t:'in',op:'in',a,b:this.sum()};
+  if(this.is('not')&&this.t[this.i+1]&&this.t[this.i+1].v==='in'){this.i+=2;return{t:'in',op:'not in',a,b:this.sum()}}
+  return a}
  bin(ops,next){let a=next.call(this);for(;;){const x=this.peek();
   if(x&&x.k==='op'&&ops.includes(x.v)){this.i++;a={t:'bin',op:x.v,a,b:next.call(this)}}else return a}}
  sum(){return this.bin(['+','-'],this.term)}
@@ -374,6 +379,7 @@ function val2(n){let b;switch(n.t){
  case 'bool':b=mk('py_bool');b.setFieldValue(n.v,'V');break;
  case 'var':b=mk('py_var');b.setFieldValue(n.n,'N');break;
  case 'bin':b=mk('py_math');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
+ case 'in':b=mk('py_in');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'cmp':b=mk('py_cmp');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'logic':b=mk('py_logic');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'not':b=mk('py_not');put(b,'A',n.a);break;
