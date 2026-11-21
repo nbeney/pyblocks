@@ -112,7 +112,7 @@ Blockly.defineBlocksWithJsonArray([
  {type:'py_if',message0:'if %1',args0:[iv('C')],message1:'%1',args1:[st('DO')],colour:210,...SB},
  {type:'py_ifelse',message0:'if %1',args0:[iv('C')],message1:'%1',args1:[st('DO')],message2:'else',message3:'%1',args3:[st('EL')],colour:210,...SB},
  {type:'py_while',message0:'while %1',args0:[iv('C')],message1:'%1',args1:[st('DO')],colour:120,...SB},
- {type:'py_for',message0:'for %1 in range( %2 )',args0:[fi('I','i'),iv('N')],message1:'%1',args1:[st('DO')],colour:120,...SB},
+ {type:'py_for',message0:'for %1 in %2',args0:[fi('I','i'),iv('N')],message1:'%1',args1:[st('DO')],colour:120,...SB},
  {type:'py_num',message0:'%1',args0:[{type:'field_number',name:'N',value:0}],output:null,colour:230},
  {type:'py_text',message0:'“ %1 ”',args0:[fi('T','hello')],output:null,colour:20},
  {type:'py_bool',message0:'%1',args0:[dd('V',['True','False'])],output:'Boolean',colour:210},
@@ -182,8 +182,8 @@ Blockly.Blocks.py_callstmt=Object.assign({init(){callInit(this,true)}},callMixin
 /* ---------- Blocks with a variable number of inputs: print(...) and [...] ---------- */
 const PM=s=>'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="'+s+'"/></svg>');
 function dynEnd(blk){blk.appendDummyInput('END').appendField(blk.tail)
- .appendField(new Blockly.FieldImage(PM('M12 5v14M5 12h14'),16,16,'add',()=>{blk.setN(blk.n+1);schedBlocks()}))
- .appendField(new Blockly.FieldImage(PM('M5 12h14'),16,16,'remove',()=>{if(blk.n>0){blk.setN(blk.n-1);schedBlocks()}}))}
+ .appendField(new Blockly.FieldImage(PM('M12 5v14M5 12h14'),16,16,'add',()=>{if(blk.n<(blk.max??Infinity)){blk.setN(blk.n+1);schedBlocks()}}))
+ .appendField(new Blockly.FieldImage(PM('M5 12h14'),16,16,'remove',()=>{if(blk.n>(blk.min??0)){blk.setN(blk.n-1);schedBlocks()}}))}
 function dynInit(blk,head,tail,colour,stmt,n0){blk.tail=tail;blk.n=n0;blk.appendDummyInput('HEAD').appendField(head);
  for(let i=0;i<n0;i++)blk.appendValueInput('A'+i);dynEnd(blk);blk.setInputsInline(true);blk.setColour(colour);
  if(stmt){blk.setPreviousStatement(true);blk.setNextStatement(true)}else blk.setOutput(true)}
@@ -195,6 +195,7 @@ const dynMixin={setN(n){this.removeInput('END');
  saveExtraState(){return{n:this.n}},loadExtraState(s){this.setN(s.n||0)}};
 Blockly.Blocks.py_print=Object.assign({init(){dynInit(this,'print(',')',160,true,1)}},dynMixin);
 Blockly.Blocks.py_list=Object.assign({init(){dynInit(this,'[',']',260,false,2)}},dynMixin);
+Blockly.Blocks.py_range=Object.assign({init(){this.min=1;this.max=3;dynInit(this,'range(',')',120,false,1)}},dynMixin);
 const dynArgs=b=>Array.from({length:b.n},(_,i)=>b.getInputTargetBlock('A'+i)?val(b,'A'+i)[0]:'None').join(', ');
 const sh=(type,f)=>({shadow:{type,fields:f}});
 const T=t=>sh('py_text',{T:t}), N=n=>sh('py_num',{N:n});
@@ -203,7 +204,7 @@ const toolbox={kind:'categoryToolbox',contents:[
  {kind:'category',name:'Output',colour:'160',contents:[{kind:'block',type:'py_print',extraState:{n:1},inputs:{A0:T('Hello!')}}]},
  {kind:'category',name:'Variables',colour:'330',custom:'PYVARS'},
  {kind:'category',name:'Logic',colour:'210',contents:[B('py_if'),B('py_ifelse'),B('py_cmp',{A:N(0),B:N(0)}),B('py_logic'),B('py_not'),B('py_bool')]},
- {kind:'category',name:'Loops',colour:'120',contents:[B('py_for',{N:N(10)}),B('py_while')]},
+ {kind:'category',name:'Loops',colour:'120',contents:[B('py_for',{N:{block:{type:'py_range',extraState:{n:1},inputs:{A0:N(10)}}}}),{kind:'block',type:'py_range',extraState:{n:1},inputs:{A0:N(10)}},{kind:'block',type:'py_range',extraState:{n:2},inputs:{A0:N(1),A1:N(11)}},{kind:'block',type:'py_range',extraState:{n:3},inputs:{A0:N(0),A1:N(10),A2:N(2)}},B('py_while')]},
  {kind:'category',name:'Functions',colour:'290',custom:'PYFUNCS'},
  {kind:'category',name:'Modules',colour:'45',contents:[B('py_import'),B('py_sleep',{A:N(1)}),B('py_choice'),B('py_shuffle'),B('py_randint',{A:N(1),B:N(10)}),B('py_randrange',{A:N(0),B:N(10)})]},
  {kind:'category',name:'Lists',colour:'260',contents:[{kind:'block',type:'py_list',extraState:{n:3},inputs:{A0:T('a'),A1:T('b'),A2:T('c')}}]},
@@ -227,6 +228,7 @@ function expr(b){const op=b.getFieldValue('OP');
   case 'py_logic':{const p=op==='and'?2:1;return[wrap(val(b,'A'),p)+` ${op} `+wrap(val(b,'B'),p+1),p]}
   case 'py_not':return['not '+wrap(val(b,'A'),3),3];
   case 'py_list':return['['+dynArgs(b)+']',10];
+  case 'py_range':return['range('+dynArgs(b)+')',10];
   case 'py_choice':return[`random.choice(${val(b,'A')[0]})`,10];
   case 'py_randint':return[`random.randint(${val(b,'A')[0]}, ${val(b,'B')[0]})`,10];
   case 'py_randrange':return[`random.randrange(${val(b,'A')[0]}, ${val(b,'B')[0]})`,10];
@@ -256,7 +258,7 @@ function stmt(b,ind){const pad='    '.repeat(ind);
   case 'py_return':return pad+'return'+(b.getInputTargetBlock('V')?' '+val(b,'V')[0]:'')+'\n';
   case 'py_def':return pad+`def ${cleanId(b.getFieldValue('NAME'))||'my_function'}(${params(b)}):\n`+body(b,'DO',ind)+(ind?'':'\n');
   case 'py_while':return pad+`while ${val(b,'C')[0]}:\n`+body(b,'DO',ind);
-  case 'py_for':return pad+`for ${nm(b)} in range(${val(b,'N')[0]}):\n`+body(b,'DO',ind);
+  case 'py_for':return pad+`for ${nm(b)} in ${val(b,'N')[0]}:\n`+body(b,'DO',ind);
  }return''}
 const generate=()=>ws.getTopBlocks(true).filter(b=>!b.outputConnection).map(b=>stmts(b,0)).join('');
 
@@ -313,6 +315,7 @@ class P{
    if(x.v==='None')return{t:'none'};
    if(x.v==='input'&&this.is('(')){this.i++;let a={t:'none'};if(!this.is(')'))a=this.or();if(this.is(','))this.fail('input() takes one prompt');this.need(')');return{t:'input',a}}
    if(this.is('(')&&DEFS.has(x.v)){this.i++;return{t:'call',f:x.v,args:this.args()}}
+   if(x.v==='range'&&this.is('(')){this.i++;const args=this.args();if(args.length<1||args.length>3)this.fail('range() takes 1, 2 or 3 values');return{t:'range',args}}
    if(this.is('(')){if(!FN.includes(x.v))this.fail(`there’s no block for ${x.v}() yet`);
     this.i++;const a=this.or();if(this.is(','))this.fail(`${x.v}() blocks take one value`);this.need(')');return{t:'fn',f:x.v,a}}
    return{t:'var',n:x.v}}
@@ -336,7 +339,7 @@ function parseBlock(lines,i,indent){const out=[];
   else if(kw==='if'){p.i=1;const[nd,j]=ifS(lines,i,indent,p,L.n);out.push(nd);i=j}
   else if(kw==='while'){p.i=1;const c=p.or();p.need(':');p.end();const[body,j]=sub(lines,i,indent,L.n);out.push({t:'while',c,body});i=j}
   else if(kw==='for'){p.i=1;const v=p.peek();if(!v||v.k!=='id')p.fail('I expected a variable name after “for”');p.i++;
-   p.need('in');p.need('range');p.need('(');const n=p.or();if(p.is(','))p.fail('blocks only know range(n) for now');p.need(')');p.need(':');p.end();
+   p.need('in');const n=p.or();p.need(':');p.end();
    const[body,j]=sub(lines,i,indent,L.n);out.push({t:'for',v:v.v,n,body});i=j}
   else if(kw==='def'){p.i=1;const nt=p.peek();if(!nt||nt.k!=='id')p.fail('I expected a function name after “def”');p.i++;p.need('(');const ps=[];
    if(!p.is(')')){do{const q=p.peek();if(!q||q.k!=='id')p.fail('I expected a parameter name');p.i++;ps.push(q.v)}while(p.eat(','))}
@@ -374,6 +377,7 @@ function val2(n){let b;switch(n.t){
  case 'logic':b=mk('py_logic');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'not':b=mk('py_not');put(b,'A',n.a);break;
  case 'list':b=mk('py_list');b.setN(n.items.length);n.items.forEach((a,i)=>put(b,'A'+i,a));break;
+ case 'range':b=mk('py_range');b.setN(n.args.length);n.args.forEach((a,i)=>put(b,'A'+i,a));break;
  case 'mod':{b=mk({'random.choice':'py_choice','random.randint':'py_randint','random.randrange':'py_randrange'}[n.f]);n.args.forEach((a,i)=>put(b,i?'B':'A',a));break}
  case 'call':b=mk('py_call');b.setFieldValue(n.f,'F');b.setN(n.args.length);n.args.forEach((a,i)=>put(b,'A'+i,a));break;
  case 'input':b=mk('py_input');put(b,'A',n.a);break;
