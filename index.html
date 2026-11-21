@@ -438,6 +438,14 @@ function codeToBlocks(){pC=false;
   setStatus('warn',`Line ${e.line}: ${e.msg}. Blocks show your last working version — editing them will replace your code.`)}}
 function schedBlocks(){pB=true;setStatus('syncing');clearTimeout(tB);tB=setTimeout(blocksToCode,350)}
 ws.addChangeListener(e=>{if(!e.isUiEvent)schedBlocks()});
+// When a number or text block is dragged out of the menu, open its editor on drop so the value can be typed straight away.
+const fresh=new Set();
+ws.addChangeListener(e=>{
+ if(e.type===Blockly.Events.BLOCK_CREATE){fresh.clear();fresh.add(e.blockId)}
+ else if(e.type===Blockly.Events.BLOCK_DRAG&&e.isStart){if(!fresh.has(e.blockId))fresh.clear()}
+ else if(e.type===Blockly.Events.BLOCK_DRAG&&!e.isStart){
+  const b=fresh.has(e.blockId)&&ws.getBlockById(e.blockId),f=b&&{py_num:'N',py_text:'T'}[b.type];fresh.clear();
+  if(f)setTimeout(()=>{if(!b.isDisposed())b.getField(f).showEditor()})}});
 cm.on('change',(_,c)=>{if(c.origin==='setValue')return;pC=true;setStatus('syncing');clearTimeout(tC);tC=setTimeout(codeToBlocks,700)});
 
 function load(code){clearTimeout(tB);clearTimeout(tC);cm.setValue(code);codeToBlocks()}
