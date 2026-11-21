@@ -187,8 +187,11 @@ function dynEnd(blk){blk.appendDummyInput('END').appendField(blk.tail)
 function dynInit(blk,head,tail,colour,stmt,n0){blk.tail=tail;blk.n=n0;blk.appendDummyInput('HEAD').appendField(head);
  for(let i=0;i<n0;i++)blk.appendValueInput('A'+i);dynEnd(blk);blk.setInputsInline(true);blk.setColour(colour);
  if(stmt){blk.setPreviousStatement(true);blk.setNextStatement(true)}else blk.setOutput(true)}
-const dynMixin={setN(n){for(let i=0;this.getInput('A'+i);i++)this.removeInput('A'+i);this.removeInput('END');this.n=n;
-  for(let i=0;i<n;i++)this.appendValueInput('A'+i);dynEnd(this)},
+// Only add or remove the inputs that change, so blocks plugged into the other slots stay connected.
+const dynMixin={setN(n){this.removeInput('END');
+  for(let i=this.n;i<n;i++)this.appendValueInput('A'+i);
+  for(let i=this.n-1;i>=n;i--)this.removeInput('A'+i);
+  this.n=n;dynEnd(this)},
  saveExtraState(){return{n:this.n}},loadExtraState(s){this.setN(s.n||0)}};
 Blockly.Blocks.py_print=Object.assign({init(){dynInit(this,'print(',')',160,true,1)}},dynMixin);
 Blockly.Blocks.py_list=Object.assign({init(){dynInit(this,'[',']',260,false,2)}},dynMixin);
