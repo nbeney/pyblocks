@@ -112,7 +112,7 @@ Blockly.defineBlocksWithJsonArray([
  {type:'py_if',message0:'if %1',args0:[iv('C')],message1:'%1',args1:[st('DO')],colour:210,...SB},
  {type:'py_ifelse',message0:'if %1',args0:[iv('C')],message1:'%1',args1:[st('DO')],message2:'else',message3:'%1',args3:[st('EL')],colour:210,...SB},
  {type:'py_while',message0:'while %1',args0:[iv('C')],message1:'%1',args1:[st('DO')],colour:120,...SB},
- {type:'py_for',message0:'for %1 in %2',args0:[fi('I','i'),iv('N')],message1:'%1',args1:[st('DO')],colour:120,...SB},
+ {type:'py_for',message0:'for %1 in %2',args0:[fi('I','value'),iv('N')],message1:'%1',args1:[st('DO')],colour:120,...SB},
  {type:'py_num',message0:'%1',args0:[{type:'field_number',name:'N',value:0}],output:null,colour:230},
  {type:'py_text',message0:'“ %1 ”',args0:[fi('T','hello')],output:null,colour:20},
  {type:'py_bool',message0:'%1',args0:[dd('V',['True','False'])],output:'Boolean',colour:210},
@@ -181,9 +181,10 @@ Blockly.Blocks.py_call=Object.assign({init(){callInit(this,false)}},callMixin);
 Blockly.Blocks.py_callstmt=Object.assign({init(){callInit(this,true)}},callMixin);
 /* ---------- Blocks with a variable number of inputs: print(...) and [...] ---------- */
 const PM=s=>'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="'+s+'"/></svg>');
-function dynEnd(blk){blk.appendDummyInput('END').appendField(blk.tail)
- .appendField(new Blockly.FieldImage(PM('M12 5v14M5 12h14'),16,16,'add',()=>{if(blk.n<(blk.max??Infinity)){blk.setN(blk.n+1);schedBlocks()}}))
- .appendField(new Blockly.FieldImage(PM('M5 12h14'),16,16,'remove',()=>{if(blk.n>(blk.min??0)){blk.setN(blk.n-1);schedBlocks()}}))}
+// "+" and "-" are only shown when another value can be added or removed.
+function dynEnd(blk){const e=blk.appendDummyInput('END').appendField(blk.tail);
+ if(blk.n<(blk.max??Infinity))e.appendField(new Blockly.FieldImage(PM('M12 5v14M5 12h14'),16,16,'add',()=>{blk.setN(blk.n+1);schedBlocks()}));
+ if(blk.n>(blk.min??0))e.appendField(new Blockly.FieldImage(PM('M5 12h14'),16,16,'remove',()=>{blk.setN(blk.n-1);schedBlocks()}))}
 function dynInit(blk,head,tail,colour,stmt,n0){blk.tail=tail;blk.n=n0;blk.appendDummyInput('HEAD').appendField(head);
  for(let i=0;i<n0;i++)blk.appendValueInput('A'+i);dynEnd(blk);blk.setInputsInline(true);blk.setColour(colour);
  if(stmt){blk.setPreviousStatement(true);blk.setNextStatement(true)}else blk.setOutput(true)}
@@ -204,7 +205,7 @@ const toolbox={kind:'categoryToolbox',contents:[
  {kind:'category',name:'Output',colour:'160',contents:[{kind:'block',type:'py_print',extraState:{n:1},inputs:{A0:T('Hello!')}}]},
  {kind:'category',name:'Variables',colour:'330',custom:'PYVARS'},
  {kind:'category',name:'Logic',colour:'210',contents:[B('py_if'),B('py_ifelse'),B('py_cmp',{A:N(0),B:N(0)}),B('py_logic'),B('py_not'),B('py_bool')]},
- {kind:'category',name:'Loops',colour:'120',contents:[B('py_for',{N:{block:{type:'py_range',extraState:{n:1},inputs:{A0:N(10)}}}}),{kind:'block',type:'py_range',extraState:{n:1},inputs:{A0:N(10)}},{kind:'block',type:'py_range',extraState:{n:2},inputs:{A0:N(1),A1:N(11)}},{kind:'block',type:'py_range',extraState:{n:3},inputs:{A0:N(0),A1:N(10),A2:N(2)}},B('py_while')]},
+ {kind:'category',name:'Loops',colour:'120',contents:[B('py_for'),{kind:'block',type:'py_range',extraState:{n:1},inputs:{A0:N(10)}},B('py_while')]},
  {kind:'category',name:'Functions',colour:'290',custom:'PYFUNCS'},
  {kind:'category',name:'Modules',colour:'45',contents:[B('py_import'),B('py_sleep',{A:N(1)}),B('py_choice'),B('py_shuffle'),B('py_randint',{A:N(1),B:N(10)}),B('py_randrange',{A:N(0),B:N(10)})]},
  {kind:'category',name:'Lists',colour:'260',contents:[{kind:'block',type:'py_list',extraState:{n:3},inputs:{A0:T('a'),A1:T('b'),A2:T('c')}}]},
