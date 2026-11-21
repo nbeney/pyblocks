@@ -132,6 +132,7 @@ Blockly.defineBlocksWithJsonArray([
  {type:'py_import',message0:'import %1',args0:[dd('M',['random','time'])],colour:45,...SB},
  {type:'py_sleep',message0:'time.sleep( %1 )',args0:[iv('A')],colour:45,...SB},
  {type:'py_shuffle',message0:'random.shuffle( %1 )',args0:[iv('A')],colour:45,...SB},
+ {type:'py_index',message0:'%1 [ %2 ]',args0:[iv('A'),iv('I')],inputsInline:true,output:null,colour:260},
  {type:'py_choice',message0:'random.choice( %1 )',args0:[iv('A')],inputsInline:true,output:null,colour:45},
  {type:'py_randint',message0:'random.randint( %1 , %2 )',args0:[iv('A'),iv('B')],inputsInline:true,output:null,colour:45},
  {type:'py_randrange',message0:'random.randrange( %1 , %2 )',args0:[iv('A'),iv('B')],inputsInline:true,output:null,colour:45}
@@ -209,7 +210,7 @@ const toolbox={kind:'categoryToolbox',contents:[
  {kind:'category',name:'Loops',colour:'120',contents:[B('py_for'),{kind:'block',type:'py_range',extraState:{n:1},inputs:{A0:N(10)}},B('py_while')]},
  {kind:'category',name:'Functions',colour:'290',custom:'PYFUNCS'},
  {kind:'category',name:'Modules',colour:'45',contents:[B('py_import'),B('py_sleep',{A:N(1)}),B('py_choice'),B('py_shuffle'),B('py_randint',{A:N(1),B:N(10)}),B('py_randrange',{A:N(0),B:N(10)})]},
- {kind:'category',name:'Lists',colour:'260',contents:[{kind:'block',type:'py_list',extraState:{n:3},inputs:{A0:T('a'),A1:T('b'),A2:T('c')}}]},
+ {kind:'category',name:'Lists',colour:'260',contents:[{kind:'block',type:'py_list',extraState:{n:3},inputs:{A0:T('a'),A1:T('b'),A2:T('c')}},B('py_index',{I:N(0)})]},
  {kind:'category',name:'Math',colour:'230',contents:[B('py_num'),B('py_math',{A:N(1),B:N(1)}),B('py_fn')]},
  {kind:'category',name:'Text',colour:'20',contents:[B('py_text'),B('py_input',{A:T('What is your name? ')})]},
  {kind:'category',name:'Others',colour:'#8a94a6',contents:[B('py_comment'),B('py_pass'),B('py_ellipsis')]}
@@ -231,6 +232,7 @@ function expr(b){const op=b.getFieldValue('OP');
   case 'py_logic':{const p=op==='and'?2:1;return[wrap(val(b,'A'),p)+` ${op} `+wrap(val(b,'B'),p+1),p]}
   case 'py_not':return['not '+wrap(val(b,'A'),3),3];
   case 'py_list':return['['+dynArgs(b)+']',10];
+  case 'py_index':return[wrap(val(b,'A'),10)+'['+val(b,'I')[0]+']',10];
   case 'py_range':return['range('+dynArgs(b)+')',10];
   case 'py_choice':return[`random.choice(${val(b,'A')[0]})`,10];
   case 'py_randint':return[`random.randint(${val(b,'A')[0]}, ${val(b,'B')[0]})`,10];
@@ -306,7 +308,8 @@ class P{
   if(x&&x.k==='op'&&ops.includes(x.v)){this.i++;a={t:'bin',op:x.v,a,b:next.call(this)}}else return a}}
  sum(){return this.bin(['+','-'],this.term)}
  term(){return this.bin(['*','/','//','%'],this.unary)}
- unary(){if(this.eat('-')){const e=this.unary();return e.t==='num'?{t:'num',v:-e.v}:{t:'bin',op:'-',a:{t:'num',v:0},b:e}}return this.atom()}
+ unary(){if(this.eat('-')){const e=this.unary();return e.t==='num'?{t:'num',v:-e.v}:{t:'bin',op:'-',a:{t:'num',v:0},b:e}}return this.post()}
+ post(){let a=this.atom();while(this.eat('[')){const i=this.or();this.need(']');a={t:'index',a,i}}return a}
  atom(){const x=this.peek();if(!x)this.fail('something is missing here');this.i++;
   if(x.k==='num')return{t:'num',v:x.v};
   if(x.k==='str')return{t:'str',v:x.v};
@@ -383,6 +386,7 @@ function val2(n){let b;switch(n.t){
  case 'cmp':b=mk('py_cmp');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'logic':b=mk('py_logic');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'not':b=mk('py_not');put(b,'A',n.a);break;
+ case 'index':b=mk('py_index');put(b,'A',n.a);put(b,'I',n.i);break;
  case 'list':b=mk('py_list');b.setN(n.items.length);n.items.forEach((a,i)=>put(b,'A'+i,a));break;
  case 'range':b=mk('py_range');b.setN(n.args.length);n.args.forEach((a,i)=>put(b,'A'+i,a));break;
  case 'mod':{b=mk({'random.choice':'py_choice','random.randint':'py_randint','random.randrange':'py_randrange'}[n.f]);n.args.forEach((a,i)=>put(b,i?'B':'A',a));break}
