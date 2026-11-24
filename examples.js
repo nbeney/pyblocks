@@ -53,6 +53,76 @@ while count < 5:
     count += 1
 ` }
   ],
+  'Lists': [
+    { title: 'Make a list', code: `# EXAMPLE: Make a list
+
+fruits = ["apple", "banana", "cherry"]
+print(fruits)
+print("First fruit:", fruits[0])
+print("Last fruit:", fruits[-1])
+` },
+    { title: 'Loop over a list', code: `# EXAMPLE: Loop over a list
+
+colors = ["red", "green", "blue"]
+for color in colors:
+    print("I like", color)
+` },
+    { title: 'Loop with an index', code: `# EXAMPLE: Loop with an index
+
+scores = [4, 8, 15]
+total = 0
+for i in range(3):
+    print("Score", i, "is", scores[i])
+    total += scores[i]
+print("Total:", total)
+` },
+    { title: 'Is it in the list?', code: `# EXAMPLE: Is it in the list?
+
+pets = ["cat", "dog", "fish"]
+pet = input("Name a pet: ")
+if pet in pets:
+    print("Yes,", pet, "is in the list")
+else:
+    print("No,", pet, "is not in the list")
+` },
+    { title: 'Pick at random', code: `# EXAMPLE: Pick at random
+
+import random
+
+names = ["Sam", "Alex", "Robin", "Kim"]
+print("The winner is", random.choice(names))
+` }
+  ],
+  'Dictionaries': [
+    { title: 'Make a dictionary', code: `# EXAMPLE: Make a dictionary
+
+ages = {"Sam": 10, "Alex": 12}
+print(ages)
+print("Sam is", ages["Sam"])
+` },
+    { title: 'Change a dictionary', code: `# EXAMPLE: Change a dictionary
+
+ages = {"Sam": 10, "Alex": 12}
+ages["Sam"] = 11
+ages["Robin"] = 9
+print(ages)
+` },
+    { title: 'Loop over the keys', code: `# EXAMPLE: Loop over the keys
+
+ages = {"Sam": 10, "Alex": 12, "Robin": 9}
+for name in ages:
+    print(name, "is", ages[name])
+` },
+    { title: 'Look something up', code: `# EXAMPLE: Look something up
+
+capitals = {"France": "Paris", "Italy": "Rome", "Spain": "Madrid"}
+country = input("Which country? ")
+if country in capitals:
+    print("The capital is", capitals[country])
+else:
+    print("I do not know that country")
+` }
+  ],
   'Functions': [
     { title: 'Make a function', code: `# EXAMPLE: Make a function
 
