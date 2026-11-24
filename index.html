@@ -525,11 +525,21 @@ $('share').onclick=async()=>{
  $('url').value=location.href.split('#')[0]+'#'+toHex(u);cpBtn('Copy');$('dlg').showModal();$('url').select()};
 $('cp').onclick=async()=>{$('url').select();try{await navigator.clipboard.writeText($('url').value)}catch(e){document.execCommand('copy')}cpBtn('Copied!')};
 $('cl').onclick=()=>$('dlg').close();
+/* ---------- Persistence: keep the code in IndexedDB so a page refresh does not lose it ---------- */
+const dbOpen=()=>new Promise((ok,no)=>{try{const r=indexedDB.open('pyblocks',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)}catch(e){no(e)}});
+async function dbGet(){try{const db=await dbOpen();return await new Promise(ok=>{const q=db.transaction('kv').objectStore('kv').get('code');q.onsuccess=()=>{db.close();ok(q.result)};q.onerror=()=>{db.close();ok(undefined)}})}catch(e){return undefined}}
+async function dbSet(v){try{const db=await dbOpen();db.transaction('kv','readwrite').objectStore('kv').put(v,'code').transaction.oncomplete=()=>db.close()}catch(e){}}
 (async()=>{const h=location.hash.slice(1);let code=null;
  if(/^([0-9a-f]{2})+$/.test(h)&&typeof DecompressionStream!=='undefined'){
   try{code=JSON.parse(new TextDecoder().decode(await pipe(fromHex(h),new DecompressionStream('deflate-raw')))).c}catch(e){}}
+ if(typeof code!=='string')code=await dbGet();
  const first=((window.PB_EXAMPLES||{}).Basics||[{code:''}])[0].code;
- load(typeof code==='string'?code:first)})();
+ load(typeof code==='string'?code:first);
+ // Save the Python code (the blocks are rebuilt from it) shortly after every change, and when the page is hidden or closed.
+ let tS=null;const save=()=>{clearTimeout(tS);tS=null;dbSet(cm.getValue())};
+ cm.on('change',()=>{clearTimeout(tS);tS=setTimeout(save,400)});
+ addEventListener('pagehide',()=>{if(tS)save()});
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&tS)save()})})();
 </script>
 </body>
 </html>
