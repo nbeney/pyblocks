@@ -133,6 +133,8 @@ Blockly.defineBlocksWithJsonArray([
  {type:'py_sleep',message0:'time.sleep( %1 )',args0:[iv('A')],colour:45,...SB},
  {type:'py_shuffle',message0:'random.shuffle( %1 )',args0:[iv('A')],colour:45,...SB},
  {type:'py_index',message0:'%1 [ %2 ]',args0:[iv('A'),iv('I')],inputsInline:true,output:null,colour:260},
+ {type:'py_entry',message0:'%1 : %2',args0:[iv('K'),iv('V')],inputsInline:true,output:'Entry',colour:180},
+ {type:'py_setitem',message0:'%1 [ %2 ] = %3',args0:[iv('A'),iv('I'),iv('V')],colour:180,...SB},
  {type:'py_choice',message0:'random.choice( %1 )',args0:[iv('A')],inputsInline:true,output:null,colour:45},
  {type:'py_randint',message0:'random.randint( %1 , %2 )',args0:[iv('A'),iv('B')],inputsInline:true,output:null,colour:45},
  {type:'py_randrange',message0:'random.randrange( %1 , %2 )',args0:[iv('A'),iv('B')],inputsInline:true,output:null,colour:45}
@@ -188,16 +190,18 @@ function dynEnd(blk){const e=blk.appendDummyInput('END').appendField(blk.tail);
  if(blk.n<(blk.max??Infinity))e.appendField(new Blockly.FieldImage(PM('M12 5v14M5 12h14'),16,16,'add',()=>{blk.setN(blk.n+1);schedBlocks()}));
  if(blk.n>(blk.min??0))e.appendField(new Blockly.FieldImage(PM('M5 12h14'),16,16,'remove',()=>{blk.setN(blk.n-1);schedBlocks()}))}
 function dynInit(blk,head,tail,colour,stmt,n0){blk.tail=tail;blk.n=n0;blk.appendDummyInput('HEAD').appendField(head);
- for(let i=0;i<n0;i++)blk.appendValueInput('A'+i);dynEnd(blk);blk.setInputsInline(true);blk.setColour(colour);
+ for(let i=0;i<n0;i++)blk.appendValueInput('A'+i).setCheck(blk.chk);dynEnd(blk);blk.setInputsInline(true);blk.setColour(colour);
  if(stmt){blk.setPreviousStatement(true);blk.setNextStatement(true)}else blk.setOutput(true)}
 // Only add or remove the inputs that change, so blocks plugged into the other slots stay connected.
 const dynMixin={setN(n){this.removeInput('END');
-  for(let i=this.n;i<n;i++)this.appendValueInput('A'+i);
+  for(let i=this.n;i<n;i++)this.appendValueInput('A'+i).setCheck(this.chk);
   for(let i=this.n-1;i>=n;i--)this.removeInput('A'+i);
   this.n=n;dynEnd(this)},
  saveExtraState(){return{n:this.n}},loadExtraState(s){this.setN(s.n||0)}};
 Blockly.Blocks.py_print=Object.assign({init(){dynInit(this,'print(',')',160,true,1)}},dynMixin);
 Blockly.Blocks.py_list=Object.assign({init(){dynInit(this,'[',']',260,false,2)}},dynMixin);
+// A dictionary holds entry blocks ("key : value"), one per slot; "+" and "-" add and remove slots.
+Blockly.Blocks.py_dict=Object.assign({init(){this.chk='Entry';dynInit(this,'{','}',180,false,1)}},dynMixin);
 Blockly.Blocks.py_range=Object.assign({init(){this.min=1;this.max=3;dynInit(this,'range(',')',120,false,1)}},dynMixin);
 const dynArgs=b=>Array.from({length:b.n},(_,i)=>b.getInputTargetBlock('A'+i)?val(b,'A'+i)[0]:'None').join(', ');
 const sh=(type,f)=>({shadow:{type,fields:f}});
@@ -211,6 +215,7 @@ const toolbox={kind:'categoryToolbox',contents:[
  {kind:'category',name:'Functions',colour:'290',custom:'PYFUNCS'},
  {kind:'category',name:'Modules',colour:'45',contents:[B('py_import'),B('py_sleep',{A:N(1)}),B('py_choice'),B('py_shuffle'),B('py_randint',{A:N(1),B:N(10)}),B('py_randrange',{A:N(0),B:N(10)})]},
  {kind:'category',name:'Lists',colour:'260',contents:[{kind:'block',type:'py_list',extraState:{n:3},inputs:{A0:T('a'),A1:T('b'),A2:T('c')}},B('py_index',{I:N(0)})]},
+ {kind:'category',name:'Dictionaries',colour:'180',contents:[{kind:'block',type:'py_dict',extraState:{n:1},inputs:{A0:{block:{type:'py_entry',inputs:{K:T('key'),V:T('value')}}}}},B('py_entry',{K:T('key'),V:T('value')}),B('py_index',{I:T('key')}),B('py_setitem',{I:T('key'),V:T('value')})]},
  {kind:'category',name:'Math',colour:'230',contents:[B('py_num'),B('py_math',{A:N(1),B:N(1)}),B('py_fn')]},
  {kind:'category',name:'Text',colour:'20',contents:[B('py_text'),B('py_input',{A:T('What is your name? ')})]},
  {kind:'category',name:'Others',colour:'#8a94a6',contents:[B('py_comment'),B('py_pass'),B('py_ellipsis')]}
@@ -232,6 +237,8 @@ function expr(b){const op=b.getFieldValue('OP');
   case 'py_logic':{const p=op==='and'?2:1;return[wrap(val(b,'A'),p)+` ${op} `+wrap(val(b,'B'),p+1),p]}
   case 'py_not':return['not '+wrap(val(b,'A'),3),3];
   case 'py_list':return['['+dynArgs(b)+']',10];
+  case 'py_dict':{const parts=[];for(let i=0;i<b.n;i++){const c=b.getInputTargetBlock('A'+i);if(c&&c.type==='py_entry')parts.push(val(c,'K')[0]+': '+val(c,'V')[0])}return['{'+parts.join(', ')+'}',10]}
+  case 'py_entry':return['None',10];
   case 'py_index':return[wrap(val(b,'A'),10)+'['+val(b,'I')[0]+']',10];
   case 'py_range':return['range('+dynArgs(b)+')',10];
   case 'py_choice':return[`random.choice(${val(b,'A')[0]})`,10];
@@ -258,6 +265,7 @@ function stmt(b,ind){const pad='    '.repeat(ind);
   case 'py_if':case 'py_ifelse':return ifGen(b,ind,'if');
   case 'py_pass':return pad+'pass\n';
   case 'py_ellipsis':return pad+'...\n';
+  case 'py_setitem':return pad+`${wrap(val(b,'A'),10)}[${val(b,'I')[0]}] = ${val(b,'V')[0]}\n`;
   case 'py_comment':return pad+'# '+String(b.getFieldValue('T')).replace(/\n/g,' ')+'\n';
   case 'py_callstmt':return pad+callCode(b)+'\n';
   case 'py_return':return pad+'return'+(b.getInputTargetBlock('V')?' '+val(b,'V')[0]:'')+'\n';
@@ -280,7 +288,7 @@ function tokenize(src){const lines=[];hasComment=false;
    if(m=s.match(/^(\d+\.?\d*|\.\d+)/))toks.push({k:'num',v:parseFloat(m[0])});
    else if(m=s.match(/^"((?:[^"\\]|\\.)*)"|^'((?:[^'\\]|\\.)*)'/))toks.push({k:'str',v:unesc(m[1]!==undefined?m[1]:m[2])});
    else if(m=s.match(/^[A-Za-z_]\w*/))toks.push({k:'id',v:m[0]});
-   else if(m=s.match(/^(\.\.\.|==|!=|<=|>=|\/\/|\+=|-=|[-+*\/%<>=():,.\[\]])/))toks.push({k:'op',v:m[0]});
+   else if(m=s.match(/^(\.\.\.|==|!=|<=|>=|\/\/|\+=|-=|[-+*\/%<>=():,.\[\]{}])/))toks.push({k:'op',v:m[0]});
    else throw{line:i+1,msg:`blocks don’t know the character “${s[0]}”`};
    s=s.slice(m[0].length)}
   lines.push({n:i+1,indent,toks})});
@@ -314,6 +322,7 @@ class P{
   if(x.k==='num')return{t:'num',v:x.v};
   if(x.k==='str')return{t:'str',v:x.v};
   if(x.k==='op'&&x.v==='['){const items=[];if(!this.is(']')){do items.push(this.or());while(this.eat(','))}this.need(']');return{t:'list',items}}
+  if(x.k==='op'&&x.v==='{'){const items=[];if(!this.is('}')){do{const k=this.or();this.need(':');items.push({t:'entry',k,v:this.or()})}while(this.eat(','))}this.need('}');return{t:'dict',items}}
   if(x.k==='op'&&x.v==='('){const e=this.or();this.need(')');return e}
   if(x.k==='id'){
    if((x.v==='random'||x.v==='time')&&this.is('.')){this.i++;const m=this.peek();if(!m||m.k!=='id')this.fail('I expected a function name after the dot');this.i++;
@@ -359,6 +368,7 @@ function parseBlock(lines,i,indent){const out=[];
   else if(L.toks[1]&&L.toks[1].v==='.'&&['time.sleep','random.shuffle'].includes(kw+'.'+(L.toks[2]||{}).v)){p.i=3;p.need('(');const e=p.or();p.need(')');p.end();out.push({t:L.toks[2].v,e})}
   else if(f.v==='...'){p.i=1;p.end();out.push({t:'ellipsis'})}
   else if(kw==='pass'){p.i=1;p.end();out.push({t:'pass'})}
+  else if(kw&&L.toks[1]&&L.toks[1].v==='['){const t=p.post();if(t.t!=='index')p.fail('blocks can’t show this line yet');p.need('=');const e=p.or();p.end();out.push({t:'setitem',a:t.a,i:t.i,e})}
   else if(kw&&L.toks[1]&&(L.toks[1].v==='='||L.toks[1].v==='+=')){const op=L.toks[1].v;p.i=2;const e=p.or();p.end();out.push({t:op==='='?'set':'change',n:kw,e})}
   else p.fail(kw&&L.toks[1]&&L.toks[1].v==='('?`there’s no block for ${kw}() yet`:'blocks can’t show this line yet');
  }
@@ -386,6 +396,8 @@ function val2(n){let b;switch(n.t){
  case 'cmp':b=mk('py_cmp');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'logic':b=mk('py_logic');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'not':b=mk('py_not');put(b,'A',n.a);break;
+ case 'dict':b=mk('py_dict');b.setN(n.items.length);n.items.forEach((a,i)=>put(b,'A'+i,a));break;
+ case 'entry':b=mk('py_entry');put(b,'K',n.k);put(b,'V',n.v);break;
  case 'index':b=mk('py_index');put(b,'A',n.a);put(b,'I',n.i);break;
  case 'list':b=mk('py_list');b.setN(n.items.length);n.items.forEach((a,i)=>put(b,'A'+i,a));break;
  case 'range':b=mk('py_range');b.setN(n.args.length);n.args.forEach((a,i)=>put(b,'A'+i,a));break;
@@ -401,6 +413,7 @@ function stmt2(s){let b;switch(s.t){
  case 'import':b=mk('py_import');b.setFieldValue(s.m,'M');break;
  case 'sleep':b=mk('py_sleep');put(b,'A',s.e);break;
  case 'shuffle':b=mk('py_shuffle');put(b,'A',s.e);break;
+ case 'setitem':b=mk('py_setitem');put(b,'A',s.a);put(b,'I',s.i);put(b,'V',s.e);break;
  case 'pass':b=mk('py_pass');break;
  case 'ellipsis':b=mk('py_ellipsis');break;
  case 'comment':b=mk('py_comment');b.setFieldValue(s.text,'T');break;
