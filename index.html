@@ -142,6 +142,9 @@ Blockly.defineBlocksWithJsonArray([
  {type:'py_reverse',message0:'%1 .reverse()',args0:[iv('L')],inputsInline:true,colour:260,...SB},
  {type:'py_find',message0:'%1 .index( %2 )',args0:[iv('L'),iv('A')],inputsInline:true,output:null,colour:260},
  {type:'py_lcount',message0:'%1 .count( %2 )',args0:[iv('L'),iv('A')],inputsInline:true,output:null,colour:260},
+ {type:'py_add',message0:'%1 .add( %2 )',args0:[iv('L'),iv('A')],inputsInline:true,colour:200,...SB},
+ {type:'py_discard',message0:'%1 .discard( %2 )',args0:[iv('L'),iv('A')],inputsInline:true,colour:200,...SB},
+ {type:'py_setop',message0:'%1 . %2 ( %3 )',args0:[iv('L'),dd('OP',['union','intersection','difference']),iv('A')],inputsInline:true,output:null,colour:200},
  {type:'py_choice',message0:'random.choice( %1 )',args0:[iv('A')],inputsInline:true,output:null,colour:45},
  {type:'py_randint',message0:'random.randint( %1 , %2 )',args0:[iv('A'),iv('B')],inputsInline:true,output:null,colour:45},
  {type:'py_randrange',message0:'random.randrange( %1 , %2 )',args0:[iv('A'),iv('B')],inputsInline:true,output:null,colour:45}
@@ -207,6 +210,9 @@ const dynMixin={setN(n){this.removeInput('END');
  saveExtraState(){return{n:this.n}},loadExtraState(s){this.setN(s.n||0)}};
 Blockly.Blocks.py_print=Object.assign({init(){dynInit(this,'print(',')',160,true,1)}},dynMixin);
 Blockly.Blocks.py_list=Object.assign({init(){dynInit(this,'[',']',260,false,2)}},dynMixin);
+// Sets: {a, b, c} needs at least one value (an empty {} is a dictionary), so the empty set is set().
+Blockly.Blocks.py_sset=Object.assign({init(){this.min=1;dynInit(this,'{','}',200,false,3)}},dynMixin);
+Blockly.Blocks.py_setcall=Object.assign({init(){this.min=0;this.max=1;dynInit(this,'set(',')',200,false,0)}},dynMixin);
 // pop(): a list, then 0 or 1 index. One block for use on its own line and one that gives a value.
 const popInit=(blk,stmt)=>{blk.min=0;blk.max=1;blk.appendValueInput('L');dynInit(blk,'.pop(',')',260,stmt,0)};
 Blockly.Blocks.py_pop=Object.assign({init(){popInit(this,false)}},dynMixin);
@@ -227,6 +233,7 @@ const toolbox={kind:'categoryToolbox',contents:[
  {kind:'category',name:'Modules',colour:'45',contents:[B('py_import'),B('py_sleep',{A:N(1)}),B('py_choice'),B('py_shuffle'),B('py_randint',{A:N(1),B:N(10)}),B('py_randrange',{A:N(0),B:N(10)})]},
  {kind:'category',name:'Lists',colour:'260',contents:[{kind:'block',type:'py_list',extraState:{n:3},inputs:{A0:T('a'),A1:T('b'),A2:T('c')}},B('py_index',{I:N(0)}),B('py_append',{A:T('item')}),B('py_insert',{I:N(0),A:T('item')}),B('py_remove',{A:T('item')}),B('py_popstmt'),B('py_sort'),B('py_reverse'),B('py_pop'),B('py_find',{A:T('item')}),B('py_lcount',{A:T('item')}),{kind:'block',type:'py_fn',fields:{F:'len'}}]},
  {kind:'category',name:'Dictionaries',colour:'180',contents:[{kind:'block',type:'py_dict',extraState:{n:1},inputs:{A0:{block:{type:'py_entry',inputs:{K:T('key'),V:T('value')}}}}},B('py_entry',{K:T('key'),V:T('value')}),B('py_index',{I:T('key')}),B('py_setitem',{I:T('key'),V:T('value')})]},
+ {kind:'category',name:'Sets',colour:'200',contents:[{kind:'block',type:'py_sset',extraState:{n:3},inputs:{A0:N(1),A1:N(2),A2:N(3)}},B('py_setcall'),B('py_add',{A:N(4)}),B('py_remove',{A:N(4)}),B('py_discard',{A:N(4)}),B('py_setop'),{kind:'block',type:'py_fn',fields:{F:'len'}}]},
  {kind:'category',name:'Math',colour:'230',contents:[B('py_num'),B('py_math',{A:N(1),B:N(1)}),B('py_fn')]},
  {kind:'category',name:'Text',colour:'20',contents:[B('py_text'),B('py_input',{A:T('What is your name? ')})]},
  {kind:'category',name:'Others',colour:'#8a94a6',contents:[B('py_comment'),B('py_pass'),B('py_ellipsis')]}
@@ -248,6 +255,9 @@ function expr(b){const op=b.getFieldValue('OP');
   case 'py_logic':{const p=op==='and'?2:1;return[wrap(val(b,'A'),p)+` ${op} `+wrap(val(b,'B'),p+1),p]}
   case 'py_not':return['not '+wrap(val(b,'A'),3),3];
   case 'py_list':return['['+dynArgs(b)+']',10];
+  case 'py_sset':return[b.n?'{'+dynArgs(b)+'}':'set()',10];
+  case 'py_setcall':return['set('+dynArgs(b)+')',10];
+  case 'py_setop':return[`${wrap(val(b,'L'),10)}.${b.getFieldValue('OP')}(${val(b,'A')[0]})`,10];
   case 'py_find':return[`${wrap(val(b,'L'),10)}.index(${val(b,'A')[0]})`,10];
   case 'py_lcount':return[`${wrap(val(b,'L'),10)}.count(${val(b,'A')[0]})`,10];
   case 'py_pop':return[`${wrap(val(b,'L'),10)}.pop(${dynArgs(b)})`,10];
@@ -279,6 +289,8 @@ function stmt(b,ind){const pad='    '.repeat(ind);
   case 'py_if':case 'py_ifelse':return ifGen(b,ind,'if');
   case 'py_pass':return pad+'pass\n';
   case 'py_ellipsis':return pad+'...\n';
+  case 'py_add':return pad+`${wrap(val(b,'L'),10)}.add(${val(b,'A')[0]})\n`;
+  case 'py_discard':return pad+`${wrap(val(b,'L'),10)}.discard(${val(b,'A')[0]})\n`;
   case 'py_append':return pad+`${wrap(val(b,'L'),10)}.append(${val(b,'A')[0]})\n`;
   case 'py_insert':return pad+`${wrap(val(b,'L'),10)}.insert(${val(b,'I')[0]}, ${val(b,'A')[0]})\n`;
   case 'py_remove':return pad+`${wrap(val(b,'L'),10)}.remove(${val(b,'A')[0]})\n`;
@@ -349,7 +361,11 @@ class P{
   if(x.k==='num')return{t:'num',v:x.v};
   if(x.k==='str')return{t:'str',v:x.v};
   if(x.k==='op'&&x.v==='['){const items=[];if(!this.is(']')){do items.push(this.or());while(this.eat(','))}this.need(']');return{t:'list',items}}
-  if(x.k==='op'&&x.v==='{'){const items=[];if(!this.is('}')){do{const k=this.or();this.need(':');items.push({t:'entry',k,v:this.or()})}while(this.eat(','))}this.need('}');return{t:'dict',items}}
+  if(x.k==='op'&&x.v==='{'){
+   if(this.eat('}'))return{t:'dict',items:[]};
+   const first=this.or();
+   if(this.eat(':')){const items=[{t:'entry',k:first,v:this.or()}];while(this.eat(',')){const k=this.or();this.need(':');items.push({t:'entry',k,v:this.or()})}this.need('}');return{t:'dict',items}}
+   const items=[first];while(this.eat(','))items.push(this.or());this.need('}');return{t:'sset',items}}
   if(x.k==='op'&&x.v==='('){const e=this.or();this.need(')');return e}
   if(x.k==='id'){
    if((x.v==='random'||x.v==='time')&&this.is('.')){this.i++;const m=this.peek();if(!m||m.k!=='id')this.fail('I expected a function name after the dot');this.i++;
@@ -360,6 +376,7 @@ class P{
    if(x.v==='None')return{t:'none'};
    if(x.v==='input'&&this.is('(')){this.i++;let a={t:'none'};if(!this.is(')'))a=this.or();if(this.is(','))this.fail('input() takes one prompt');this.need(')');return{t:'input',a}}
    if(this.is('(')&&DEFS.has(x.v)){this.i++;return{t:'call',f:x.v,args:this.args()}}
+   if(x.v==='set'&&this.is('(')){this.i++;const args=this.args();if(args.length>1)this.fail('set() takes at most one value');return{t:'setcall',args}}
    if(x.v==='range'&&this.is('(')){this.i++;const args=this.args();if(args.length<1||args.length>3)this.fail('range() takes 1, 2 or 3 values');return{t:'range',args}}
    if(this.is('(')){if(!FN.includes(x.v))this.fail(`there’s no block for ${x.v}() yet`);
     this.i++;const a=this.or();if(this.is(','))this.fail(`${x.v}() blocks take one value`);this.need(')');return{t:'fn',f:x.v,a}}
@@ -405,8 +422,8 @@ function parseBlock(lines,i,indent){const out=[];
  if(i<lines.length&&lines[i].indent>indent)throw{line:lines[i].n,msg:'unexpected indent'};
  return[out,i]}
 const DEFS=new Set();
-const METHODS={append:[1,1],insert:[2,2],remove:[1,1],sort:[0,0],reverse:[0,0],pop:[0,1],index:[1,1],count:[1,1]};
-const STMT_ONLY=new Set(['append','insert','remove','sort','reverse']),STMT_M=new Set(['append','insert','remove','sort','reverse','pop']);
+const METHODS={add:[1,1],discard:[1,1],union:[1,1],intersection:[1,1],difference:[1,1],append:[1,1],insert:[2,2],remove:[1,1],sort:[0,0],reverse:[0,0],pop:[0,1],index:[1,1],count:[1,1]};
+const STMT_ONLY=new Set(['add','discard','append','insert','remove','sort','reverse']),STMT_M=new Set(['add','discard','append','insert','remove','sort','reverse','pop']);
 const MODS={'random.choice':1,'random.randint':2,'random.randrange':2};
 function parse(src){const lines=tokenize(src);if(!lines.length)return[];
  DEFS.clear();lines.forEach(l=>{if(l.toks&&l.toks[0].v==='def'&&l.toks[1])DEFS.add(l.toks[1].v)});
@@ -428,7 +445,9 @@ function val2(n){let b;switch(n.t){
  case 'cmp':b=mk('py_cmp');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'logic':b=mk('py_logic');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'not':b=mk('py_not');put(b,'A',n.a);break;
- case 'method':{const bt={pop:'py_pop',index:'py_find',count:'py_lcount'}[n.m];b=mk(bt);put(b,'L',n.a);if(n.m==='pop'){b.setN(n.args.length);n.args.forEach((a,i)=>put(b,'A'+i,a))}else put(b,'A',n.args[0]);break}
+ case 'sset':b=mk('py_sset');b.setN(n.items.length);n.items.forEach((a,i)=>put(b,'A'+i,a));break;
+ case 'setcall':b=mk('py_setcall');b.setN(n.args.length);n.args.forEach((a,i)=>put(b,'A'+i,a));break;
+ case 'method':{if(['union','intersection','difference'].includes(n.m)){b=mk('py_setop');b.setFieldValue(n.m,'OP');put(b,'L',n.a);put(b,'A',n.args[0]);break}const bt={pop:'py_pop',index:'py_find',count:'py_lcount'}[n.m];b=mk(bt);put(b,'L',n.a);if(n.m==='pop'){b.setN(n.args.length);n.args.forEach((a,i)=>put(b,'A'+i,a))}else put(b,'A',n.args[0]);break}
  case 'dict':b=mk('py_dict');b.setN(n.items.length);n.items.forEach((a,i)=>put(b,'A'+i,a));break;
  case 'entry':b=mk('py_entry');put(b,'K',n.k);put(b,'V',n.v);break;
  case 'index':b=mk('py_index');put(b,'A',n.a);put(b,'I',n.i);break;
@@ -446,7 +465,7 @@ function stmt2(s){let b;switch(s.t){
  case 'import':b=mk('py_import');b.setFieldValue(s.m,'M');break;
  case 'sleep':b=mk('py_sleep');put(b,'A',s.e);break;
  case 'shuffle':b=mk('py_shuffle');put(b,'A',s.e);break;
- case 'mstmt':{const n=s.node,bt={append:'py_append',insert:'py_insert',remove:'py_remove',sort:'py_sort',reverse:'py_reverse',pop:'py_popstmt'}[n.m];b=mk(bt);put(b,'L',n.a);
+ case 'mstmt':{const n=s.node,bt={add:'py_add',discard:'py_discard',append:'py_append',insert:'py_insert',remove:'py_remove',sort:'py_sort',reverse:'py_reverse',pop:'py_popstmt'}[n.m];b=mk(bt);put(b,'L',n.a);
   if(n.m==='pop'){b.setN(n.args.length);n.args.forEach((a,i)=>put(b,'A'+i,a))}else if(n.m==='insert'){put(b,'I',n.args[0]);put(b,'A',n.args[1])}else if(n.args.length)put(b,'A',n.args[0]);break}
  case 'setitem':b=mk('py_setitem');put(b,'A',s.a);put(b,'I',s.i);put(b,'V',s.e);break;
  case 'pass':b=mk('py_pass');break;

@@ -165,6 +165,49 @@ else:
     print("I do not know that country")
 ` }
   ],
+  'Sets': [
+    { title: 'Make a set', code: `# EXAMPLE: Make a set
+
+colors = {"red", "green", "blue", "red"}
+print(colors)
+print("Number of colors:", len(colors))
+` },
+    { title: 'Add and remove', code: `# EXAMPLE: Add and remove
+
+tags = set()
+tags.add("python")
+tags.add("blocks")
+tags.add("python")
+print(tags)
+tags.remove("blocks")
+tags.discard("scratch")
+print(tags)
+` },
+    { title: 'Remove duplicates', code: `# EXAMPLE: Remove duplicates
+
+numbers = [3, 1, 3, 2, 1, 3]
+unique = set(numbers)
+print("Unique:", sorted(unique))
+print("Count:", len(unique))
+` },
+    { title: 'Is it in the set?', code: `# EXAMPLE: Is it in the set?
+
+vowels = {"a", "e", "i", "o", "u"}
+letter = input("Type a letter: ")
+if letter in vowels:
+    print(letter, "is a vowel")
+else:
+    print(letter, "is not a vowel")
+` },
+    { title: 'Compare two sets', code: `# EXAMPLE: Compare two sets
+
+alice = {"cat", "dog", "fish"}
+bob = {"dog", "bird", "fish"}
+print("Both like:", sorted(alice.intersection(bob)))
+print("Together:", sorted(alice.union(bob)))
+print("Only Alice:", sorted(alice.difference(bob)))
+` }
+  ],
   'Functions': [
     { title: 'Make a function', code: `# EXAMPLE: Make a function
 
