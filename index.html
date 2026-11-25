@@ -104,7 +104,7 @@ const iv=n=>({type:'input_value',name:n}), st=n=>({type:'input_statement',name:n
 const dd=(n,o)=>({type:'field_dropdown',name:n,options:o.map(x=>[x,x])});
 const fi=(n,t)=>({type:'field_input',name:n,text:t});
 const SB={previousStatement:null,nextStatement:null,inputsInline:true};
-const FN=['str','int','float','len','abs','round'];
+const FN=['str','int','float','len','abs','round','sum','min','max','sorted'];
 Blockly.defineBlocksWithJsonArray([
  
  
@@ -117,7 +117,7 @@ Blockly.defineBlocksWithJsonArray([
  {type:'py_text',message0:'“ %1 ”',args0:[fi('T','hello')],output:null,colour:20},
  {type:'py_bool',message0:'%1',args0:[dd('V',['True','False'])],output:'Boolean',colour:210},
  
- {type:'py_math',message0:'%1 %2 %3',args0:[iv('A'),dd('OP',['+','-','*','/','//','%']),iv('B')],inputsInline:true,output:null,colour:230},
+ {type:'py_math',message0:'%1 %2 %3',args0:[iv('A'),dd('OP',['+','-','*','/','//','%','**']),iv('B')],inputsInline:true,output:null,colour:230},
  {type:'py_cmp',message0:'%1 %2 %3',args0:[iv('A'),dd('OP',['==','!=','<','>','<=','>=']),iv('B')],inputsInline:true,output:'Boolean',colour:210},
  {type:'py_in',message0:'%1 %2 %3',args0:[iv('A'),dd('OP',['in','not in']),iv('B')],inputsInline:true,output:'Boolean',colour:210},
  {type:'py_logic',message0:'%1 %2 %3',args0:[iv('A'),dd('OP',['and','or']),iv('B')],inputsInline:true,output:'Boolean',colour:210},
@@ -135,6 +135,13 @@ Blockly.defineBlocksWithJsonArray([
  {type:'py_index',message0:'%1 [ %2 ]',args0:[iv('A'),iv('I')],inputsInline:true,output:null,colour:260},
  {type:'py_entry',message0:'%1 : %2',args0:[iv('K'),iv('V')],inputsInline:true,output:'Entry',colour:180},
  {type:'py_setitem',message0:'%1 [ %2 ] = %3',args0:[iv('A'),iv('I'),iv('V')],colour:180,...SB},
+ {type:'py_append',message0:'%1 .append( %2 )',args0:[iv('L'),iv('A')],inputsInline:true,colour:260,...SB},
+ {type:'py_insert',message0:'%1 .insert( %2 , %3 )',args0:[iv('L'),iv('I'),iv('A')],inputsInline:true,colour:260,...SB},
+ {type:'py_remove',message0:'%1 .remove( %2 )',args0:[iv('L'),iv('A')],inputsInline:true,colour:260,...SB},
+ {type:'py_sort',message0:'%1 .sort()',args0:[iv('L')],inputsInline:true,colour:260,...SB},
+ {type:'py_reverse',message0:'%1 .reverse()',args0:[iv('L')],inputsInline:true,colour:260,...SB},
+ {type:'py_find',message0:'%1 .index( %2 )',args0:[iv('L'),iv('A')],inputsInline:true,output:null,colour:260},
+ {type:'py_lcount',message0:'%1 .count( %2 )',args0:[iv('L'),iv('A')],inputsInline:true,output:null,colour:260},
  {type:'py_choice',message0:'random.choice( %1 )',args0:[iv('A')],inputsInline:true,output:null,colour:45},
  {type:'py_randint',message0:'random.randint( %1 , %2 )',args0:[iv('A'),iv('B')],inputsInline:true,output:null,colour:45},
  {type:'py_randrange',message0:'random.randrange( %1 , %2 )',args0:[iv('A'),iv('B')],inputsInline:true,output:null,colour:45}
@@ -200,6 +207,10 @@ const dynMixin={setN(n){this.removeInput('END');
  saveExtraState(){return{n:this.n}},loadExtraState(s){this.setN(s.n||0)}};
 Blockly.Blocks.py_print=Object.assign({init(){dynInit(this,'print(',')',160,true,1)}},dynMixin);
 Blockly.Blocks.py_list=Object.assign({init(){dynInit(this,'[',']',260,false,2)}},dynMixin);
+// pop(): a list, then 0 or 1 index. One block for use on its own line and one that gives a value.
+const popInit=(blk,stmt)=>{blk.min=0;blk.max=1;blk.appendValueInput('L');dynInit(blk,'.pop(',')',260,stmt,0)};
+Blockly.Blocks.py_pop=Object.assign({init(){popInit(this,false)}},dynMixin);
+Blockly.Blocks.py_popstmt=Object.assign({init(){popInit(this,true)}},dynMixin);
 // A dictionary holds entry blocks ("key : value"), one per slot; "+" and "-" add and remove slots.
 Blockly.Blocks.py_dict=Object.assign({init(){this.chk='Entry';dynInit(this,'{','}',180,false,1)}},dynMixin);
 Blockly.Blocks.py_range=Object.assign({init(){this.min=1;this.max=3;dynInit(this,'range(',')',120,false,1)}},dynMixin);
@@ -214,7 +225,7 @@ const toolbox={kind:'categoryToolbox',contents:[
  {kind:'category',name:'Loops',colour:'120',contents:[B('py_for'),{kind:'block',type:'py_range',extraState:{n:1},inputs:{A0:N(10)}},B('py_while')]},
  {kind:'category',name:'Functions',colour:'290',custom:'PYFUNCS'},
  {kind:'category',name:'Modules',colour:'45',contents:[B('py_import'),B('py_sleep',{A:N(1)}),B('py_choice'),B('py_shuffle'),B('py_randint',{A:N(1),B:N(10)}),B('py_randrange',{A:N(0),B:N(10)})]},
- {kind:'category',name:'Lists',colour:'260',contents:[{kind:'block',type:'py_list',extraState:{n:3},inputs:{A0:T('a'),A1:T('b'),A2:T('c')}},B('py_index',{I:N(0)})]},
+ {kind:'category',name:'Lists',colour:'260',contents:[{kind:'block',type:'py_list',extraState:{n:3},inputs:{A0:T('a'),A1:T('b'),A2:T('c')}},B('py_index',{I:N(0)}),B('py_append',{A:T('item')}),B('py_insert',{I:N(0),A:T('item')}),B('py_remove',{A:T('item')}),B('py_popstmt'),B('py_sort'),B('py_reverse'),B('py_pop'),B('py_find',{A:T('item')}),B('py_lcount',{A:T('item')}),{kind:'block',type:'py_fn',fields:{F:'len'}}]},
  {kind:'category',name:'Dictionaries',colour:'180',contents:[{kind:'block',type:'py_dict',extraState:{n:1},inputs:{A0:{block:{type:'py_entry',inputs:{K:T('key'),V:T('value')}}}}},B('py_entry',{K:T('key'),V:T('value')}),B('py_index',{I:T('key')}),B('py_setitem',{I:T('key'),V:T('value')})]},
  {kind:'category',name:'Math',colour:'230',contents:[B('py_num'),B('py_math',{A:N(1),B:N(1)}),B('py_fn')]},
  {kind:'category',name:'Text',colour:'20',contents:[B('py_text'),B('py_input',{A:T('What is your name? ')})]},
@@ -231,12 +242,15 @@ function expr(b){const op=b.getFieldValue('OP');
   case 'py_text':return[JSON.stringify(b.getFieldValue('T')),10];
   case 'py_bool':return[b.getFieldValue('V'),10];
   case 'py_var':return[nm(b),10];
-  case 'py_math':{const p=(op==='+'||op==='-')?5:6;return[wrap(val(b,'A'),p)+` ${op} `+wrap(val(b,'B'),p+1),p]}
+  case 'py_math':{if(op==='**'){let l=wrap(val(b,'A'),8);if(l[0]==='-')l='('+l+')';return[l+' ** '+wrap(val(b,'B'),7),7]}const p=(op==='+'||op==='-')?5:6;return[wrap(val(b,'A'),p)+` ${op} `+wrap(val(b,'B'),p+1),p]}
   case 'py_in':return[wrap(val(b,'A'),5)+` ${op} `+wrap(val(b,'B'),5),4];
   case 'py_cmp':return[wrap(val(b,'A'),5)+` ${op} `+wrap(val(b,'B'),5),4];
   case 'py_logic':{const p=op==='and'?2:1;return[wrap(val(b,'A'),p)+` ${op} `+wrap(val(b,'B'),p+1),p]}
   case 'py_not':return['not '+wrap(val(b,'A'),3),3];
   case 'py_list':return['['+dynArgs(b)+']',10];
+  case 'py_find':return[`${wrap(val(b,'L'),10)}.index(${val(b,'A')[0]})`,10];
+  case 'py_lcount':return[`${wrap(val(b,'L'),10)}.count(${val(b,'A')[0]})`,10];
+  case 'py_pop':return[`${wrap(val(b,'L'),10)}.pop(${dynArgs(b)})`,10];
   case 'py_dict':{const parts=[];for(let i=0;i<b.n;i++){const c=b.getInputTargetBlock('A'+i);if(c&&c.type==='py_entry')parts.push(val(c,'K')[0]+': '+val(c,'V')[0])}return['{'+parts.join(', ')+'}',10]}
   case 'py_entry':return['None',10];
   case 'py_index':return[wrap(val(b,'A'),10)+'['+val(b,'I')[0]+']',10];
@@ -265,6 +279,12 @@ function stmt(b,ind){const pad='    '.repeat(ind);
   case 'py_if':case 'py_ifelse':return ifGen(b,ind,'if');
   case 'py_pass':return pad+'pass\n';
   case 'py_ellipsis':return pad+'...\n';
+  case 'py_append':return pad+`${wrap(val(b,'L'),10)}.append(${val(b,'A')[0]})\n`;
+  case 'py_insert':return pad+`${wrap(val(b,'L'),10)}.insert(${val(b,'I')[0]}, ${val(b,'A')[0]})\n`;
+  case 'py_remove':return pad+`${wrap(val(b,'L'),10)}.remove(${val(b,'A')[0]})\n`;
+  case 'py_sort':return pad+`${wrap(val(b,'L'),10)}.sort()\n`;
+  case 'py_reverse':return pad+`${wrap(val(b,'L'),10)}.reverse()\n`;
+  case 'py_popstmt':return pad+`${wrap(val(b,'L'),10)}.pop(${dynArgs(b)})\n`;
   case 'py_setitem':return pad+`${wrap(val(b,'A'),10)}[${val(b,'I')[0]}] = ${val(b,'V')[0]}\n`;
   case 'py_comment':return pad+'# '+String(b.getFieldValue('T')).replace(/\n/g,' ')+'\n';
   case 'py_callstmt':return pad+callCode(b)+'\n';
@@ -288,7 +308,7 @@ function tokenize(src){const lines=[];hasComment=false;
    if(m=s.match(/^(\d+\.?\d*|\.\d+)/))toks.push({k:'num',v:parseFloat(m[0])});
    else if(m=s.match(/^"((?:[^"\\]|\\.)*)"|^'((?:[^'\\]|\\.)*)'/))toks.push({k:'str',v:unesc(m[1]!==undefined?m[1]:m[2])});
    else if(m=s.match(/^[A-Za-z_]\w*/))toks.push({k:'id',v:m[0]});
-   else if(m=s.match(/^(\.\.\.|==|!=|<=|>=|\/\/|\+=|-=|[-+*\/%<>=():,.\[\]{}])/))toks.push({k:'op',v:m[0]});
+   else if(m=s.match(/^(\.\.\.|==|!=|<=|>=|\*\*|\/\/|\+=|-=|[-+*\/%<>=():,.\[\]{}])/))toks.push({k:'op',v:m[0]});
    else throw{line:i+1,msg:`blocks don’t know the character “${s[0]}”`};
    s=s.slice(m[0].length)}
   lines.push({n:i+1,indent,toks})});
@@ -316,8 +336,15 @@ class P{
   if(x&&x.k==='op'&&ops.includes(x.v)){this.i++;a={t:'bin',op:x.v,a,b:next.call(this)}}else return a}}
  sum(){return this.bin(['+','-'],this.term)}
  term(){return this.bin(['*','/','//','%'],this.unary)}
- unary(){if(this.eat('-')){const e=this.unary();return e.t==='num'?{t:'num',v:-e.v}:{t:'bin',op:'-',a:{t:'num',v:0},b:e}}return this.post()}
- post(){let a=this.atom();while(this.eat('[')){const i=this.or();this.need(']');a={t:'index',a,i}}return a}
+ unary(){if(this.eat('-')){const e=this.unary();return e.t==='num'?{t:'num',v:-e.v}:{t:'bin',op:'-',a:{t:'num',v:0},b:e}}return this.pow()}
+ pow(){const a=this.post();return this.eat('**')?{t:'bin',op:'**',a,b:this.unary()}:a}
+ post(){const top=this.stmt;this.stmt=false;let a=this.atom();
+  for(;;){
+   if(this.eat('[')){const i=this.or();this.need(']');a={t:'index',a,i}}
+   else if(this.is('.')){this.i++;const m=this.peek();if(!m||m.k!=='id'||!METHODS[m.v])this.fail('I expected a list method after the dot (like append)');this.i++;this.need('(');
+    const args=this.args(),[lo,hi]=METHODS[m.v];if(args.length<lo||args.length>hi)this.fail(`${m.v}() needs ${lo===hi?lo:lo+' to '+hi} value${hi>1?'s':''}`);
+    a={t:'method',m:m.v,a,args};if(STMT_ONLY.has(m.v)&&!(top&&!this.peek()))this.fail(`${m.v}() does not give a value, so put it on a line of its own`)}
+   else return a}}
  atom(){const x=this.peek();if(!x)this.fail('something is missing here');this.i++;
   if(x.k==='num')return{t:'num',v:x.v};
   if(x.k==='str')return{t:'str',v:x.v};
@@ -368,13 +395,18 @@ function parseBlock(lines,i,indent){const out=[];
   else if(L.toks[1]&&L.toks[1].v==='.'&&['time.sleep','random.shuffle'].includes(kw+'.'+(L.toks[2]||{}).v)){p.i=3;p.need('(');const e=p.or();p.need(')');p.end();out.push({t:L.toks[2].v,e})}
   else if(f.v==='...'){p.i=1;p.end();out.push({t:'ellipsis'})}
   else if(kw==='pass'){p.i=1;p.end();out.push({t:'pass'})}
-  else if(kw&&L.toks[1]&&L.toks[1].v==='['){const t=p.post();if(t.t!=='index')p.fail('blocks can’t show this line yet');p.need('=');const e=p.or();p.end();out.push({t:'setitem',a:t.a,i:t.i,e})}
+  else if(kw&&L.toks[1]&&(L.toks[1].v==='['||L.toks[1].v==='.')){p.stmt=true;const t=p.post();
+   if(t.t==='method'){if(!STMT_M.has(t.m))p.fail('blocks can’t show this line yet');p.end();out.push({t:'mstmt',node:t})}
+   else if(t.t==='index'){p.need('=');const e=p.or();p.end();out.push({t:'setitem',a:t.a,i:t.i,e})}
+   else p.fail('blocks can’t show this line yet')}
   else if(kw&&L.toks[1]&&(L.toks[1].v==='='||L.toks[1].v==='+=')){const op=L.toks[1].v;p.i=2;const e=p.or();p.end();out.push({t:op==='='?'set':'change',n:kw,e})}
   else p.fail(kw&&L.toks[1]&&L.toks[1].v==='('?`there’s no block for ${kw}() yet`:'blocks can’t show this line yet');
  }
  if(i<lines.length&&lines[i].indent>indent)throw{line:lines[i].n,msg:'unexpected indent'};
  return[out,i]}
 const DEFS=new Set();
+const METHODS={append:[1,1],insert:[2,2],remove:[1,1],sort:[0,0],reverse:[0,0],pop:[0,1],index:[1,1],count:[1,1]};
+const STMT_ONLY=new Set(['append','insert','remove','sort','reverse']),STMT_M=new Set(['append','insert','remove','sort','reverse','pop']);
 const MODS={'random.choice':1,'random.randint':2,'random.randrange':2};
 function parse(src){const lines=tokenize(src);if(!lines.length)return[];
  DEFS.clear();lines.forEach(l=>{if(l.toks&&l.toks[0].v==='def'&&l.toks[1])DEFS.add(l.toks[1].v)});
@@ -396,6 +428,7 @@ function val2(n){let b;switch(n.t){
  case 'cmp':b=mk('py_cmp');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'logic':b=mk('py_logic');b.setFieldValue(n.op,'OP');put(b,'A',n.a);put(b,'B',n.b);break;
  case 'not':b=mk('py_not');put(b,'A',n.a);break;
+ case 'method':{const bt={pop:'py_pop',index:'py_find',count:'py_lcount'}[n.m];b=mk(bt);put(b,'L',n.a);if(n.m==='pop'){b.setN(n.args.length);n.args.forEach((a,i)=>put(b,'A'+i,a))}else put(b,'A',n.args[0]);break}
  case 'dict':b=mk('py_dict');b.setN(n.items.length);n.items.forEach((a,i)=>put(b,'A'+i,a));break;
  case 'entry':b=mk('py_entry');put(b,'K',n.k);put(b,'V',n.v);break;
  case 'index':b=mk('py_index');put(b,'A',n.a);put(b,'I',n.i);break;
@@ -413,6 +446,8 @@ function stmt2(s){let b;switch(s.t){
  case 'import':b=mk('py_import');b.setFieldValue(s.m,'M');break;
  case 'sleep':b=mk('py_sleep');put(b,'A',s.e);break;
  case 'shuffle':b=mk('py_shuffle');put(b,'A',s.e);break;
+ case 'mstmt':{const n=s.node,bt={append:'py_append',insert:'py_insert',remove:'py_remove',sort:'py_sort',reverse:'py_reverse',pop:'py_popstmt'}[n.m];b=mk(bt);put(b,'L',n.a);
+  if(n.m==='pop'){b.setN(n.args.length);n.args.forEach((a,i)=>put(b,'A'+i,a))}else if(n.m==='insert'){put(b,'I',n.args[0]);put(b,'A',n.args[1])}else if(n.args.length)put(b,'A',n.args[0]);break}
  case 'setitem':b=mk('py_setitem');put(b,'A',s.a);put(b,'I',s.i);put(b,'V',s.e);break;
  case 'pass':b=mk('py_pass');break;
  case 'ellipsis':b=mk('py_ellipsis');break;

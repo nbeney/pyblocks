@@ -91,6 +91,48 @@ import random
 
 names = ["Sam", "Alex", "Robin", "Kim"]
 print("The winner is", random.choice(names))
+` },
+    { title: 'Add to a list', code: `# EXAMPLE: Add to a list
+
+shopping = ["milk", "eggs"]
+shopping.append("bread")
+shopping.insert(0, "apples")
+print(shopping)
+print("Items:", len(shopping))
+` },
+    { title: 'Build a list in a loop', code: `# EXAMPLE: Build a list in a loop
+
+squares = []
+for i in range(1, 6):
+    squares.append(i ** 2)
+print(squares)
+` },
+    { title: 'Remove from a list', code: `# EXAMPLE: Remove from a list
+
+fruits = ["apple", "banana", "cherry", "banana"]
+fruits.remove("banana")
+print(fruits)
+last = fruits.pop()
+print("Removed", last)
+fruits.pop(0)
+print(fruits)
+` },
+    { title: 'Sort and reverse', code: `# EXAMPLE: Sort and reverse
+
+numbers = [5, 2, 9, 1]
+numbers.sort()
+print("Sorted:", numbers)
+numbers.reverse()
+print("Reversed:", numbers)
+` },
+    { title: 'Find things in a list', code: `# EXAMPLE: Find things in a list
+
+letters = ["a", "b", "c", "b"]
+print("b is at position", letters.index("b"))
+print("b appears", letters.count("b"), "times")
+scores = [4, 8, 15]
+print("Total:", sum(scores))
+print("Best:", max(scores), "Worst:", min(scores))
 ` }
   ],
   'Dictionaries': [
