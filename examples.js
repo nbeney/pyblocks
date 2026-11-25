@@ -2,19 +2,19 @@
    The Examples menu builds itself from this object (one sub-menu per group). */
 window.PB_EXAMPLES = {
   'Basics': [
-    { title: 'Ask a question', code: `# EXAMPLE: Ask a question
+    { title: 'Ask a question', code: `# Basics - Ask a question
 
 name = input("What is your name? 😊 ")
 print("Hello,", name + "! 👋")
 print("Nice to meet you 🌟")
 print("Let's have fun learning Python together 🐍🎉")
 ` },
-    { title: 'Say hello', code: `# EXAMPLE: Say hello
+    { title: 'Say hello', code: `# Basics - Say hello
 
 name = "Sam"
 print("Hello,", name + "! 👋")
 ` },
-    { title: 'Maths with variables', code: `# EXAMPLE: Maths with variables
+    { title: 'Maths with variables', code: `# Basics - Maths with variables
 
 apples = 5
 price = 0.5
@@ -22,7 +22,7 @@ print("Total cost:", apples * price)
 ` }
   ],
   'Decisions': [
-    { title: 'If / elif / else', code: `# EXAMPLE: If / elif / else
+    { title: 'If / elif / else', code: `# Decisions - If / elif / else
 
 score = 0
 for i in range(3):
@@ -37,7 +37,7 @@ else:
 ` }
   ],
   'Loops': [
-    { title: 'Count with a for loop', code: `# EXAMPLE: Count with a for loop
+    { title: 'Count with a for loop', code: `# Loops - Count with a for loop
 
 total = 0
 for i in range(5):
@@ -45,7 +45,7 @@ for i in range(5):
     print(i)
 print("Total:", total)
 ` },
-    { title: 'While loop', code: `# EXAMPLE: While loop
+    { title: 'While loop', code: `# Loops - While loop
 
 count = 0
 while count < 5:
@@ -54,20 +54,20 @@ while count < 5:
 ` }
   ],
   'Lists': [
-    { title: 'Make a list', code: `# EXAMPLE: Make a list
+    { title: 'Make a list', code: `# Lists - Make a list
 
 fruits = ["apple", "banana", "cherry"]
 print(fruits)
 print("First fruit:", fruits[0])
 print("Last fruit:", fruits[-1])
 ` },
-    { title: 'Loop over a list', code: `# EXAMPLE: Loop over a list
+    { title: 'Loop over a list', code: `# Lists - Loop over a list
 
 colors = ["red", "green", "blue"]
 for color in colors:
     print("I like", color)
 ` },
-    { title: 'Loop with an index', code: `# EXAMPLE: Loop with an index
+    { title: 'Loop with an index', code: `# Lists - Loop with an index
 
 scores = [4, 8, 15]
 total = 0
@@ -76,7 +76,7 @@ for i in range(3):
     total += scores[i]
 print("Total:", total)
 ` },
-    { title: 'Is it in the list?', code: `# EXAMPLE: Is it in the list?
+    { title: 'Is it in the list?', code: `# Lists - Is it in the list?
 
 pets = ["cat", "dog", "fish"]
 pet = input("Name a pet: ")
@@ -85,14 +85,14 @@ if pet in pets:
 else:
     print("No,", pet, "is not in the list")
 ` },
-    { title: 'Pick at random', code: `# EXAMPLE: Pick at random
+    { title: 'Pick at random', code: `# Lists - Pick at random
 
 import random
 
 names = ["Sam", "Alex", "Robin", "Kim"]
 print("The winner is", random.choice(names))
 ` },
-    { title: 'Add to a list', code: `# EXAMPLE: Add to a list
+    { title: 'Add to a list', code: `# Lists - Add to a list
 
 shopping = ["milk", "eggs"]
 shopping.append("bread")
@@ -100,14 +100,14 @@ shopping.insert(0, "apples")
 print(shopping)
 print("Items:", len(shopping))
 ` },
-    { title: 'Build a list in a loop', code: `# EXAMPLE: Build a list in a loop
+    { title: 'Build a list in a loop', code: `# Lists - Build a list in a loop
 
 squares = []
 for i in range(1, 6):
     squares.append(i ** 2)
 print(squares)
 ` },
-    { title: 'Remove from a list', code: `# EXAMPLE: Remove from a list
+    { title: 'Remove from a list', code: `# Lists - Remove from a list
 
 fruits = ["apple", "banana", "cherry", "banana"]
 fruits.remove("banana")
@@ -117,7 +117,7 @@ print("Removed", last)
 fruits.pop(0)
 print(fruits)
 ` },
-    { title: 'Sort and reverse', code: `# EXAMPLE: Sort and reverse
+    { title: 'Sort and reverse', code: `# Lists - Sort and reverse
 
 numbers = [5, 2, 9, 1]
 numbers.sort()
@@ -125,7 +125,7 @@ print("Sorted:", numbers)
 numbers.reverse()
 print("Reversed:", numbers)
 ` },
-    { title: 'Find things in a list', code: `# EXAMPLE: Find things in a list
+    { title: 'Find things in a list', code: `# Lists - Find things in a list
 
 letters = ["a", "b", "c", "b"]
 print("b is at position", letters.index("b"))
@@ -136,26 +136,26 @@ print("Best:", max(scores), "Worst:", min(scores))
 ` }
   ],
   'Dictionaries': [
-    { title: 'Make a dictionary', code: `# EXAMPLE: Make a dictionary
+    { title: 'Make a dictionary', code: `# Dictionaries - Make a dictionary
 
 ages = {"Sam": 10, "Alex": 12}
 print(ages)
 print("Sam is", ages["Sam"])
 ` },
-    { title: 'Change a dictionary', code: `# EXAMPLE: Change a dictionary
+    { title: 'Change a dictionary', code: `# Dictionaries - Change a dictionary
 
 ages = {"Sam": 10, "Alex": 12}
 ages["Sam"] = 11
 ages["Robin"] = 9
 print(ages)
 ` },
-    { title: 'Loop over the keys', code: `# EXAMPLE: Loop over the keys
+    { title: 'Loop over the keys', code: `# Dictionaries - Loop over the keys
 
 ages = {"Sam": 10, "Alex": 12, "Robin": 9}
 for name in ages:
     print(name, "is", ages[name])
 ` },
-    { title: 'Look something up', code: `# EXAMPLE: Look something up
+    { title: 'Look something up', code: `# Dictionaries - Look something up
 
 capitals = {"France": "Paris", "Italy": "Rome", "Spain": "Madrid"}
 country = input("Which country? ")
@@ -166,13 +166,13 @@ else:
 ` }
   ],
   'Sets': [
-    { title: 'Make a set', code: `# EXAMPLE: Make a set
+    { title: 'Make a set', code: `# Sets - Make a set
 
 colors = {"red", "green", "blue", "red"}
 print(colors)
 print("Number of colors:", len(colors))
 ` },
-    { title: 'Add and remove', code: `# EXAMPLE: Add and remove
+    { title: 'Add and remove', code: `# Sets - Add and remove
 
 tags = set()
 tags.add("python")
@@ -183,14 +183,14 @@ tags.remove("blocks")
 tags.discard("scratch")
 print(tags)
 ` },
-    { title: 'Remove duplicates', code: `# EXAMPLE: Remove duplicates
+    { title: 'Remove duplicates', code: `# Sets - Remove duplicates
 
 numbers = [3, 1, 3, 2, 1, 3]
 unique = set(numbers)
 print("Unique:", sorted(unique))
 print("Count:", len(unique))
 ` },
-    { title: 'Is it in the set?', code: `# EXAMPLE: Is it in the set?
+    { title: 'Is it in the set?', code: `# Sets - Is it in the set?
 
 vowels = {"a", "e", "i", "o", "u"}
 letter = input("Type a letter: ")
@@ -199,7 +199,7 @@ if letter in vowels:
 else:
     print(letter, "is not a vowel")
 ` },
-    { title: 'Compare two sets', code: `# EXAMPLE: Compare two sets
+    { title: 'Compare two sets', code: `# Sets - Compare two sets
 
 alice = {"cat", "dog", "fish"}
 bob = {"dog", "bird", "fish"}
@@ -209,7 +209,7 @@ print("Only Alice:", sorted(alice.difference(bob)))
 ` }
   ],
   'Functions': [
-    { title: 'Make a function', code: `# EXAMPLE: Make a function
+    { title: 'Make a function', code: `# Functions - Make a function
 
 def greet(name):
     print("Hello,", name + "!")
@@ -217,7 +217,7 @@ def greet(name):
 greet("Sam")
 greet("Alex")
 ` },
-    { title: 'Function that returns a value', code: `# EXAMPLE: Function that returns a value
+    { title: 'Function that returns a value', code: `# Functions - Function that returns a value
 
 def double(n):
     return n * 2
@@ -226,21 +226,21 @@ print(double(21))
 ` }
   ],
   'Modules': [
-    { title: 'Roll a dice', code: `# EXAMPLE: Roll a dice
+    { title: 'Roll a dice', code: `# Modules - Roll a dice
 
 import random
 
 number = random.randint(1, 6)
 print("You rolled a", number)
 ` },
-    { title: 'Pick a winner', code: `# EXAMPLE: Pick a winner
+    { title: 'Pick a winner', code: `# Modules - Pick a winner
 
 import random
 
 names = ["Ada", "Grace", "Alan", "Linus"]
 print(random.choice(names), "wins!")
 ` },
-    { title: 'Shuffle a list', code: `# EXAMPLE: Shuffle a list
+    { title: 'Shuffle a list', code: `# Modules - Shuffle a list
 
 import random
 
@@ -248,7 +248,7 @@ names = ["Ada", "Grace", "Alan", "Linus"]
 random.shuffle(names)
 print(names)
 ` },
-    { title: 'Countdown with sleep', code: `# EXAMPLE: Countdown with sleep
+    { title: 'Countdown with sleep', code: `# Modules - Countdown with sleep
 
 import time
 
@@ -257,7 +257,7 @@ for i in range(3):
     time.sleep(1)
 print("Liftoff!")
 ` },
-    { title: 'Guess the number', code: `# EXAMPLE: Guess the number
+    { title: 'Guess the number', code: `# Modules - Guess the number
 
 import random
 
